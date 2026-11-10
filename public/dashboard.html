@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Dashboard - Rapor Usaha</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400..700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten</a>
+  <div class="shell">
+    <header id="site-header" class="rail"></header>
+    <div class="stage">
+      <main id="main" tabindex="-1">
+        <div class="page-head">
+          <div>
+            <h1>Dashboard</h1>
+            <p class="sub"><span id="s-tgl">Memuat ringkasan...</span><span class="dot" aria-hidden="true"></span><span>Sumber: data contoh modul</span></p>
+          </div>
+          <div class="actions">
+            <a class="btn btn-outline" id="btn-csv" href="/api/umkm?format=csv" hidden><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-unduh"></use></svg> Unduh CSV</a>
+            <a class="btn btn-primary" href="/prediksi"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-tambah"></use></svg> Penilaian baru</a>
+          </div>
+        </div>
+        <div id="status-area" aria-live="polite"></div>
+        <div id="isi" hidden>
+          <section class="kpis" aria-label="Ringkasan angka">
+            <div class="kpi"><p class="kpi-label">UMKM tersurvei</p><p class="kpi-val" id="k-tersurvei">-</p><p class="kpi-sub" id="k-tersurvei-sub"></p></div>
+            <div class="kpi" id="k-perlu-box"><p class="kpi-label">Perlu intervensi</p><p class="kpi-val" id="k-perlu">-</p><p class="kpi-sub" id="k-perlu-sub"></p></div>
+            <div class="kpi"><p class="kpi-label">Rata-rata skor</p><p class="kpi-val" id="k-rata">-</p><p class="kpi-sub" id="k-rata-sub"></p></div>
+            <div class="kpi"><p class="kpi-label">Sejak survei sebelumnya</p><div class="kpi-val split" id="k-ubah">-</div><p class="kpi-sub" id="k-ubah-sub"></p></div>
+          </section>
+          <div class="cols">
+            <section class="card" aria-labelledby="h-prioritas">
+              <div class="card-head">
+                <div><h2 id="h-prioritas">Daftar prioritas</h2><p class="hint" id="n-prioritas"></p></div>
+                <form class="filters" id="filter-form" aria-label="Filter dashboard">
+                  <div class="field"><label for="f-sektor">Sektor</label><select id="f-sektor"><option value="">Semua sektor</option></select></div>
+                  <div class="field"><label for="f-kota">Kota</label><select id="f-kota"><option value="">Semua kota</option></select></div>
+                  <button type="button" class="btn btn-ghost btn-sm" id="f-reset">Atur ulang</button>
+                </form>
+              </div>
+              <div id="tabel-prioritas"></div>
+              <div class="card-foot"><div class="meter-legend" aria-label="Cara membaca posisi skor"><span><i class="lg-now"></i>skor terakhir</span><span><i class="lg-prev"></i>skor sebelumnya</span><span><i class="sw st-KURANG_SEHAT"></i>Prioritas Intervensi &le; 12</span><span><i class="sw st-CUKUP_SEHAT"></i>Perlu Intervensi 13&ndash;18</span><span><i class="sw st-SEHAT"></i>Perlu Perhatian 19&ndash;24</span><span><i class="sw st-SANGAT_SEHAT"></i>Best Practice &ge; 25</span></div><p id="catatan-tabel"></p></div>
+            </section>
+            <div class="stack-lg">
+              <section class="card" aria-labelledby="h-sebaran">
+                <div class="card-head"><h2 id="h-sebaran">Sebaran status</h2><span class="note" id="n-sebaran"></span></div>
+                <div class="card-body" id="sebaran"></div>
+              </section>
+              <section class="card" aria-labelledby="h-faktor">
+                <div class="card-head"><h2 id="h-faktor">Rata-rata faktor</h2><span class="note">Skala 1&ndash;5</span></div>
+                <div class="card-body"><div id="faktor"></div><p class="src" id="catatan-faktor"></p></div>
+              </section>
+            </div>
+          </div>
+          <p class="notes" id="catatan" hidden>Semua angka dihitung per UMKM dari survei terakhirnya, bukan per pengisian formulir. Ambang status 13 / 19 / 25 sesuai modul.</p>
+        </div>
+      </main>
+      <footer id="site-footer" class="sitefoot"></footer>
+    </div>
+  </div>
+  <script type="module" src="/js/dashboard.js"></script>
+</body>
+</html>

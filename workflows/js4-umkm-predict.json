@@ -1,0 +1,203 @@
+{
+  "id": "js4umkmPredict0001",
+  "name": "umkm-predict",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "predict",
+        "responseMode": "responseNode",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "id": "a1000000-0000-4000-8000-000000000001",
+      "name": "Webhook POST /predict",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        -260,
+        0
+      ],
+      "webhookId": "rapor-predict-js4",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "rapor-webhook-01",
+          "name": "Rapor Usaha Webhook Secret"
+        }
+      },
+      "notes": "POST /webhook/predict (Production URL). Header x-webhook-secret wajib cocok."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Logika penilaian yang sama dengan api/_lib/predict.js (JS-4).\n// Input: { id_umkm, sumber_daya, kepemimpinan, lingkungan_kerja,\n//          nilai_organisasi, stabilitas, kinerja }\nconst FAKTOR = ['sumber_daya', 'kepemimpinan', 'lingkungan_kerja',\n  'nilai_organisasi', 'stabilitas', 'kinerja'];\n\nconst NAMA = {\n  sumber_daya: 'Sumber Daya',\n  kepemimpinan: 'Kepemimpinan',\n  lingkungan_kerja: 'Lingkungan Kerja',\n  nilai_organisasi: 'Nilai Organisasi',\n  stabilitas: 'Stabilitas',\n  kinerja: 'Kinerja',\n};\n\nconst SARAN = {\n  sumber_daya: 'Lengkapi modal, peralatan, dan bahan baku utama, lalu catat pemakaiannya agar tidak boros.',\n  kepemimpinan: 'Tetapkan target dan pembagian tugas yang jelas, serta adakan rapat singkat rutin dengan karyawan.',\n  lingkungan_kerja: 'Rapikan tempat usaha, atur jam kerja yang wajar, dan buka ruang bagi karyawan untuk memberi masukan.',\n  nilai_organisasi: 'Rumuskan nilai dan aturan usaha secara sederhana, lalu biasakan semua anggota menjalankannya.',\n  stabilitas: 'Buat pembukuan kas sederhana dan siapkan dana cadangan agar usaha tetap berjalan saat penjualan turun.',\n  kinerja: 'Pantau penjualan dan kualitas produk setiap bulan, lalu tetapkan target perbaikan yang terukur.',\n};\n\nconst REKOMENDASI = {\n  SANGAT_SEHAT: 'Pertahankan kinerja! Jadikan UMKM ini sebagai role model.',\n  SEHAT: 'Kinerja sudah baik. Tingkatkan faktor yang masih di bawah rata-rata.',\n  CUKUP_SEHAT: 'Perlu perbaikan signifikan pada 1-2 faktor kesehatan organisasi.',\n  KURANG_SEHAT: 'Prioritas intervensi! Segera konsultasi dengan pendamping UMKM.',\n};\n\nfunction statusFromTotal(total) {\n  if (total >= 25) return { status: 'SANGAT_SEHAT', label: 'Best Practice' };\n  if (total >= 19) return { status: 'SEHAT', label: 'Perlu Perhatian' };\n  if (total >= 13) return { status: 'CUKUP_SEHAT', label: 'Perlu Intervensi' };\n  return { status: 'KURANG_SEHAT', label: 'Prioritas Intervensi' };\n}\n\nconst hasil = [];\nfor (const item of $input.all()) {\n  // Webhook v2 membungkus payload di item.json.body; dukung juga body datar.\n  const raw = item.json ?? {};\n  const b = (raw.body && typeof raw.body === 'object' && !Array.isArray(raw.body)) ? raw.body : raw;\n  const errors = [];\n  if (typeof b.id_umkm !== 'string' || !/^UMKM\\d{3}$/.test(b.id_umkm)) {\n    errors.push('id_umkm harus berformat UMKMxxx');\n  }\n\n  const skor = {};\n  for (const f of FAKTOR) {\n    const v = (typeof b[f] === 'number' || typeof b[f] === 'string') ? Number(b[f]) : NaN;\n    if (!Number.isInteger(v) || v < 1 || v > 5) {\n      errors.push(f + ' harus bilangan bulat 1-5');\n    } else {\n      skor[f] = v;\n    }\n  }\n\n  if (errors.length) {\n    hasil.push({ json: { success: false, errors } });\n    continue;\n  }\n\n  const total = FAKTOR.reduce((a, f) => a + skor[f], 0);\n  const { status, label } = statusFromTotal(total);\n  const min = Math.min(...FAKTOR.map((f) => skor[f]));\n\n  hasil.push({\n    json: {\n      success: true,\n      data: {\n        id_umkm: b.id_umkm,\n        total_skor: total,\n        status,\n        label,\n        rekomendasi: REKOMENDASI[status],\n        skor_faktor: skor,\n        faktor_terlemah: FAKTOR\n          .filter((f) => skor[f] === min)\n          .map((f) => ({ faktor: f, nama: NAMA[f], skor: min, saran: SARAN[f] })),\n      },\n    },\n  });\n}\nreturn hasil;"
+      },
+      "id": "a1000000-0000-4000-8000-000000000002",
+      "name": "Validasi & Hitung",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -40,
+        0
+      ],
+      "notes": "Validasi id_umkm, enam faktor 1-5, total, status, rekomendasi."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1000000-0000-4000-8000-000000000001",
+              "leftValue": "={{ String($json.success) }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1000000-0000-4000-8000-000000000003",
+      "name": "Sukses?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        180,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO prediksi_log (id_umkm, total_skor, status, sumber)\nVALUES ($1, $2, $3, 'webhook')\nRETURNING log_id, dibuat_pada;",
+        "options": {
+          "queryReplacement": "={{ [$json.data.id_umkm, $json.data.total_skor, $json.data.status] }}"
+        }
+      },
+      "id": "a1000000-0000-4000-8000-000000000004",
+      "name": "Simpan prediksi_log",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.8,
+      "position": [
+        440,
+        -120
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "rapor-postgres-01",
+          "name": "Postgres Rapor Usaha"
+        }
+      },
+      "notes": "Query berparameter; sumber = webhook (JS-7)."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Validasi & Hitung').first().json }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "a1000000-0000-4000-8000-000000000005",
+      "name": "Balas 200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        700,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Validasi & Hitung').first().json }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "a1000000-0000-4000-8000-000000000006",
+      "name": "Balas 400",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        440,
+        120
+      ],
+      "notes": "Input tidak valid: success=false, tidak menulis prediksi_log."
+    }
+  ],
+  "connections": {
+    "Webhook POST /predict": {
+      "main": [
+        [
+          {
+            "node": "Validasi & Hitung",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validasi & Hitung": {
+      "main": [
+        [
+          {
+            "node": "Sukses?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sukses?": {
+      "main": [
+        [
+          {
+            "node": "Simpan prediksi_log",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Balas 400",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simpan prediksi_log": {
+      "main": [
+        [
+          {
+            "node": "Balas 200",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Jakarta",
+    "saveManualExecutions": true,
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Log penilaian - Rapor Usaha</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400..700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/data.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten</a>
+  <div class="shell">
+    <header id="site-header" class="rail"></header>
+    <div class="stage">
+      <main id="main" tabindex="-1">
+
+        <div class="page-head">
+          <div>
+            <h1>Log penilaian</h1>
+            <p class="sub">Catatan setiap penilaian yang tersimpan, untuk audit dan pemeriksaan waktu respons.</p>
+            <p class="sub"><span id="s-n"></span><span class="dot" aria-hidden="true"></span><span>Sumber: data contoh modul</span></p>
+          </div>
+          <div class="actions">
+            <a class="btn btn-outline" id="btn-csv" href="/api/log?format=csv"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-unduh"></use></svg> Unduh CSV</a>
+          </div>
+        </div>
+        <section class="card" aria-label="Log penilaian">
+          <div class="toolbar">
+            <form class="filters" id="filter-form" aria-label="Filter log">
+              <div class="field"><label for="f-sumber">Sumber</label>
+                <select id="f-sumber"><option value="">Semua sumber</option><option value="web">Web</option><option value="webhook">Webhook</option><option value="schedule">Jadwal otomatis</option></select></div>
+              <div class="field"><label for="f-status">Status</label>
+                <select id="f-status"><option value="">Semua status</option><option value="SANGAT_SEHAT">Sangat Sehat</option><option value="SEHAT">Sehat</option><option value="CUKUP_SEHAT">Cukup Sehat</option><option value="KURANG_SEHAT">Kurang Sehat</option></select></div>
+            </form>
+          </div>
+          <div id="daftar" aria-live="polite"></div>
+          <nav class="pager" id="pager" aria-label="Halaman" hidden>
+            <span class="small muted" id="info-hal"></span>
+            <span class="row"><button type="button" class="btn btn-outline btn-sm" id="btn-prev"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-kembali"></use></svg> Sebelumnya</button><button type="button" class="btn btn-outline btn-sm" id="btn-next">Berikutnya <svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-panah"></use></svg></button></span>
+          </nav>
+        </section>
+      </main>
+      <footer id="site-footer" class="sitefoot"></footer>
+    </div>
+  </div>
+  <script type="module" src="/js/log.js"></script>
+</body>
+</html>

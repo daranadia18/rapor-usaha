@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Penilaian kesehatan UMKM - Rapor Usaha</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400..700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/forms.css">
+</head>
+<body class="pg-nilai">
+  <a class="skip-link" href="#main">Lewati ke konten</a>
+  <div class="shell">
+    <header id="site-header" class="rail"></header>
+    <div class="stage">
+      <main id="main" tabindex="-1">
+
+        <div class="page-head">
+          <div>
+            <h1>Penilaian kesehatan UMKM</h1>
+            <p class="sub"><span>Enam faktor, skala 1&ndash;5</span><span class="dot" aria-hidden="true"></span><span>Total 6&ndash;30, ambang 13 / 19 / 25</span></p>
+          </div>
+        </div>
+        <div id="muat-awal" aria-live="polite"></div>
+        <div class="nilai-grid" id="konten" hidden>
+          <div class="stack-lg">
+            <section class="card" aria-labelledby="h-umkm">
+              <div class="card-head"><h2 id="h-umkm">UMKM yang dinilai</h2>
+                <button type="button" class="btn btn-outline btn-sm" id="btn-tambah" aria-expanded="false" aria-controls="form-tambah"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-tambah"></use></svg> Tambah UMKM baru</button></div>
+              <div class="card-body">
+                <div class="field"><label for="umkm-cari">Cari UMKM</label><input type="search" id="umkm-cari" placeholder="Ketik nama atau ID" autocomplete="off"></div>
+                <div class="field"><label for="umkm-pilih">UMKM</label><select id="umkm-pilih" required></select>
+                  <div class="hint" id="umkm-hint"></div></div>
+                <form id="form-tambah" class="addbox" hidden novalidate>
+                  <h3>UMKM baru</h3>
+                  <div id="tambah-alert"></div>
+                  <div class="field"><label for="t-nama">Nama UMKM</label><input type="text" id="t-nama" autocomplete="off" required></div>
+                  <div class="field"><label for="t-sektor">Sektor</label><select id="t-sektor" required></select></div>
+                  <div class="field"><label for="t-kota">Kota</label><input type="text" id="t-kota" autocomplete="address-level2" required></div>
+                  <button type="submit" class="btn btn-primary" id="t-submit">Simpan UMKM</button>
+                </form>
+              </div>
+            </section>
+            <form id="form-penilaian" class="card" novalidate aria-labelledby="faktor-judul">
+              <div class="card-head"><div><h2 id="faktor-judul">Nilai enam faktor</h2>
+                <p class="hint">Pilih 1 (sangat lemah) sampai 5 (sangat baik). Penjelasan skor yang dipilih muncul di bawah tiap faktor.</p></div></div>
+              <div id="faktor-list"></div>
+              <div id="submit-alert" class="alert-slot" aria-live="assertive"></div>
+            </form>
+            <section id="hasil" class="card hasil" hidden aria-labelledby="h-hasil">
+              <div class="card-head"><h2 id="h-hasil" tabindex="-1">Hasil penilaian</h2></div>
+              <div class="card-body" id="hasil-isi"></div>
+            </section>
+          </div>
+          <aside class="live" aria-label="Posisi sementara">
+            <h2>Posisi sementara</h2>
+            <div class="live-total"><span id="lv-total">&ndash;</span><small> / 30</small></div>
+            <p class="live-line" id="lv-line"></p>
+            <div id="lv-chart"></div>
+            <div class="live-bar"><span class="tot"><span id="lb-total">&ndash;</span><small>/30</small></span><span class="stt" id="lb-stt"></span></div>
+            <button type="submit" form="form-penilaian" class="btn btn-primary btn-block" id="btn-simpan" aria-disabled="true">Simpan penilaian</button>
+          </aside>
+        </div>
+        <p class="sr-only" role="status" id="lv-sr"></p>
+      </main>
+      <footer id="site-footer" class="sitefoot"></footer>
+    </div>
+  </div>
+  <script type="module" src="/js/prediksi.js"></script>
+</body>
+</html>

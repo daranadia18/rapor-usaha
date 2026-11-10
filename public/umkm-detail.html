@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Profil UMKM - Rapor Usaha</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400..700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/data.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten</a>
+  <div class="shell">
+    <header id="site-header" class="rail"></header>
+    <div class="stage">
+      <main id="main" tabindex="-1">
+
+        <a class="crumb" href="/umkm" id="link-kembali"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-kembali"></use></svg> Daftar UMKM</a>
+        <div id="status-area" aria-live="polite"></div>
+        <div id="isi" hidden>
+          <div class="page-head detail-head">
+            <div>
+              <h1 id="nama-umkm"></h1>
+              <p class="sub" id="u-meta"></p>
+            </div>
+            <div class="head-summary">
+              <div class="total" id="u-skor"></div>
+              <div><div id="u-badge"></div><div class="when" id="u-tgl"></div></div>
+            </div>
+            <div class="actions">
+              <a class="btn btn-outline" id="btn-banding" href="/perbandingan">Bandingkan</a>
+              <a class="btn btn-primary" id="btn-survei" href="/prediksi"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-tambah"></use></svg> Penilaian baru</a>
+            </div>
+          </div>
+          <dl class="pair" id="u-pair" hidden></dl>
+          <div class="stack-lg">
+            <section class="card chart-card" aria-labelledby="h-tren">
+              <div class="card-head"><h2 id="h-tren">Perkembangan total skor</h2><span class="note">Pita 6&ndash;30, ambang 13 / 19 / 25</span></div>
+              <div class="card-body"><div id="tren-isi" class="chart-block"></div></div>
+            </section>
+            <section class="card" aria-labelledby="h-faktor-detail">
+              <div class="card-head"><h2 id="h-faktor-detail">Enam faktor dibanding rata-rata sektor</h2><span class="note">Skala 1&ndash;5</span></div>
+              <div class="card-body" id="banding-isi"></div>
+              <div class="card-foot" id="banding-catatan" hidden></div>
+            </section>
+            <section class="card" aria-labelledby="h-riwayat">
+              <div class="card-head"><h2 id="h-riwayat">Riwayat survei</h2><span class="note">Terbaru di atas</span></div>
+              <div class="table-wrap"><table class="table-stack">
+                <caption class="sr-only">Riwayat survei: skor tiap faktor, total, dan status</caption>
+                <thead><tr><th scope="col">Tanggal</th><th scope="col" class="num">Sumber Daya</th><th scope="col" class="num">Kepemimpinan</th><th scope="col" class="num">Lingkungan Kerja</th><th scope="col" class="num">Nilai Organisasi</th><th scope="col" class="num">Stabilitas</th><th scope="col" class="num">Kinerja</th><th scope="col" class="num">Total</th><th scope="col">Status</th></tr></thead>
+                <tbody id="tbody-riwayat"></tbody>
+              </table></div>
+              <div class="card-foot"><p>Sumber: data contoh modul. Tanggal survei dicatat per hari.</p></div>
+            </section>
+          </div>
+        </div>
+      </main>
+      <footer id="site-footer" class="sitefoot"></footer>
+    </div>
+  </div>
+  <script type="module" src="/js/umkm-detail.js"></script>
+</body>
+</html>

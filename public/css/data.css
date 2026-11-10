@@ -1,0 +1,29 @@
+/* Halaman data: daftar UMKM, detail, perbandingan, pemantauan, log */
+.toolbar .filters { align-items: flex-end; }
+.toolbar .filters .field { min-width: 170px; }
+.toolbar .filters .count { margin-left: auto; font-weight: 500; color: var(--ink-2); }
+.cell-first .cell-meta { display: block; }
+
+/* Detail UMKM */
+.head-summary { display: flex; align-items: center; gap: 14px 18px; flex-wrap: wrap; }
+.head-summary .total { font-size: 2.2rem; letter-spacing: -.02em; line-height: 1; }
+.head-summary .when { font-size: .88rem; color: var(--muted); display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 6px; }
+.detail-head { align-items: flex-start; }
+.chart-card .card-body { padding: 20px 24px 24px; }
+.chart-card .chart-block { min-height: 240px; }
+.pair[hidden] { display: none; }
+
+/* Perbandingan */
+.pick-form { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: flex-end; }
+.pick-form .field { margin: 0; min-width: 220px; flex: 1 1 240px; }
+
+/* Pemantauan */
+.kpi .kpi-val .tri { width: .6em; height: .6em; margin-right: 6px; color: var(--down); }
+
+@media (max-width: 640px) {
+  .toolbar { padding: 12px 16px; }
+  .toolbar .filters .field { flex: 1 1 130px; min-width: 0; }
+  .toolbar .filters .count { margin-left: 0; width: 100%; }
+  .chart-card .card-body { padding: 14px 12px 18px; }
+  .pager { padding: 12px 16px; }
+}

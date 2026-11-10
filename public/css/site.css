@@ -1,0 +1,85 @@
+/* Halaman situs (beranda, tentang, masuk, daftar, 404) - dimuat setelah style.css */
+
+/* ---------- Beranda ---------- */
+.l-sus { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px; padding: 24px 28px; margin-bottom: 20px; background: var(--brand-soft); color: var(--brand-soft-ink); border: 1px solid var(--line); border-radius: var(--r); }
+.l-sus h2 { font-size: 1.5rem; letter-spacing: -.02em; margin-bottom: 4px; color: inherit; }
+.l-sus p { margin: 0; font-size: 1.05rem; max-width: 56ch; }
+.l-sus .btn { min-height: 52px; padding-inline: 32px; font-size: 1.1rem; }
+@media (max-width: 640px) { .l-sus { padding: 20px; } .l-sus .btn { width: 100%; } }
+.l-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 40px 56px; align-items: center; padding: 20px 0 44px; }
+.l-hero h1 { font-size: clamp(1.9rem, 3.4vw, 2.75rem); line-height: 1.12; letter-spacing: -.03em; font-weight: 700; margin-bottom: 16px; }
+.l-hero .lead { font-size: 1.15rem; line-height: 1.55; color: var(--ink-2); max-width: 46ch; margin-bottom: 24px; }
+.l-hero .row { gap: 12px; }
+.l-preview { min-width: 0; }
+.l-preview .card-head { padding-block: 14px; }
+.l-preview .tag { background: var(--brand-soft); color: var(--brand-soft-ink); border-color: transparent; }
+.l-preview .table-wrap { padding-bottom: 4px; }
+.l-preview-note { margin: 10px 4px 0; font-size: .86rem; color: var(--muted); max-width: none; }
+
+.l-how { padding: 12px 0 44px; }
+.l-how > h2, .l-close h2 { font-size: 1.5rem; letter-spacing: -.02em; margin-bottom: 8px; }
+.l-how > .lead { color: var(--muted); font-size: 1.02rem; margin-bottom: 24px; max-width: 60ch; }
+.l-flow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-bottom: 22px; }
+.l-flow > div { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); padding: 18px 20px; }
+.l-flow h3 { font-size: 1.05rem; margin-bottom: 6px; }
+.l-flow p { color: var(--muted); font-size: .95rem; margin: 0 0 10px; }
+.l-flow .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.l-flow .big { font-size: 1.6rem; font-weight: 650; letter-spacing: -.02em; }
+.l-how .band-key.band-strip { max-width: none; margin-bottom: 0; }
+.l-how .band-key b { font-size: 1.15rem; }
+
+.l-close { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); padding: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 32px; }
+.l-close p { color: var(--muted); margin: 0; max-width: 56ch; }
+.l-close .row { gap: 12px; }
+
+/* ---------- Tentang ---------- */
+.doc { display: grid; gap: 20px; }
+.doc .prose { max-width: 75ch; }
+.doc .prose p:last-child { margin-bottom: 0; }
+.doc h3 { margin: 18px 0 8px; }
+.doc h3:first-child { margin-top: 0; }
+.doc .diagram { padding: 0; }
+.doc .diagram-label { margin-top: 0; }
+.doc .diagram-row + .diagram-label { margin-top: 18px; }
+.doc .code-block + h3 { margin-top: 18px; }
+.doc .table-wrap td code { white-space: nowrap; }
+.doc .card-body > .table-wrap + .table-wrap { margin-top: 16px; }
+.doc .card-body > .table-wrap { border: 1px solid var(--line); border-radius: var(--r-sm); }
+
+/* ---------- Masuk & daftar ---------- */
+.auth-box { margin-top: clamp(16px, 6vh, 64px); }
+.auth-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; font-weight: 700; font-size: 1.05rem; letter-spacing: -.015em; color: var(--ink); }
+.auth-brand img { width: 36px; height: 36px; border-radius: 9px; }
+.auth-box .auth-intro { margin-bottom: 20px; }
+.auth-box .auth-intro p { color: var(--muted); margin: 8px 0 0; }
+.auth-box form { margin: 0; }
+.auth-box fieldset { border: 0; padding: 0; margin: 0 0 16px; }
+.auth-box legend { padding: 0; }
+.auth-box .auth-switch { margin: 18px 0 0; text-align: center; color: var(--muted); font-size: .93rem; max-width: none; }
+.auth-box .auth-switch a { font-weight: 600; }
+
+/* ---------- 404 ---------- */
+.nf { display: grid; place-items: center; min-height: 60vh; }
+.nf .state { padding: 40px 20px; }
+.nf h1 { font-size: 2rem; margin-bottom: 8px; }
+.nf .row { justify-content: center; margin-top: 18px; }
+.nf .state .btn { margin-top: 0; }
+
+/* ---------- Responsif ---------- */
+@media (max-width: 1100px) {
+  .l-hero { grid-template-columns: minmax(0, 1fr); padding-bottom: 32px; }
+  .l-hero .lead { max-width: 60ch; }
+}
+@media (max-width: 760px) {
+  .l-flow { grid-template-columns: minmax(0, 1fr); }
+  .l-close { padding: 20px; }
+}
+@media (max-width: 640px) {
+  .l-hero h1 { font-size: 1.8rem; }
+  .l-hero .lead { font-size: 1.05rem; }
+  .l-hero .row .btn { flex: 1 1 140px; }
+  .l-preview .table-stack td .bt-mini { margin-left: auto; }
+}
+
+/* Pratinjau beranda: meteran lebih ringkas agar tabel tidak menggulir */
+.l-preview .meter { width: 132px; }

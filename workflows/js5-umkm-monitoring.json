@@ -1,0 +1,267 @@
+{
+  "id": "js5umkmMonitoring01",
+  "name": "umkm-monitoring",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "*/10 * * * *"
+            }
+          ]
+        }
+      },
+      "id": "b2000000-0000-4000-8000-000000000001",
+      "name": "Schedule */10 menit",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -300,
+        0
+      ],
+      "notes": "Aktifkan hanya saat uji; nonaktifkan lagi setelah selesai (JS-5)."
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.RAPOR_BASE_URL + '/api/pemantauan' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{ $env.N8N_API_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b2000000-0000-4000-8000-000000000002",
+      "name": "Ambil /api/pemantauan",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -80,
+        0
+      ],
+      "notes": "RAPOR_BASE_URL diatur di docker-compose/.env."
+    },
+    {
+      "parameters": {
+        "jsCode": "// HTTP Request mengembalikan satu item berisi { success, data: [...] }.\n// Pecah array data menjadi satu item per UMKM agar bisa diolah Edit Fields.\nconst res = $input.first().json;\nconst rows = Array.isArray(res.data) ? res.data : (Array.isArray(res) ? res : []);\nreturn rows.map((row) => ({ json: row }));"
+      },
+      "id": "b2000000-0000-4000-8000-000000000003",
+      "name": "Pecah Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        140,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d2000000-0000-4000-8000-000000000001",
+              "name": "waktu_format",
+              "value": "={{ $now.setZone('Asia/Jakarta').setLocale('id').toFormat('dd MMMM yyyy HH:mm') }}",
+              "type": "string"
+            },
+            {
+              "id": "d2000000-0000-4000-8000-000000000002",
+              "name": "total_skor",
+              "value": "={{ Number($json.total_skor) }}",
+              "type": "number"
+            },
+            {
+              "id": "d2000000-0000-4000-8000-000000000003",
+              "name": "status_message",
+              "value": "={{ $json.status + ' - ' + $json.nama_umkm }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "b2000000-0000-4000-8000-000000000004",
+      "name": "Rapikan Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        360,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d2000000-0000-4000-8000-000000000004",
+              "leftValue": "={{ $json.total_skor }}",
+              "rightValue": 13,
+              "operator": {
+                "type": "number",
+                "operation": "smaller"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b2000000-0000-4000-8000-000000000005",
+      "name": "Kritis? (<13)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        580,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO prediksi_log (id_umkm, total_skor, status, sumber)\nVALUES ($1, $2, $3, 'schedule')\nRETURNING log_id;",
+        "options": {
+          "queryReplacement": "={{ [$json.id_umkm, $json.total_skor, $json.status] }}"
+        }
+      },
+      "id": "b2000000-0000-4000-8000-000000000006",
+      "name": "Catat skor kritis",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.8,
+      "position": [
+        840,
+        -140
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "rapor-postgres-01",
+          "name": "Postgres Rapor Usaha"
+        }
+      },
+      "notes": "sumber = schedule (JS-7)."
+    },
+    {
+      "parameters": {
+        "chatId": "GANTI_CHAT_ID",
+        "text": "=⚠️ *{{ $json.status_message }}*\\nTotal skor: {{ $json.total_skor }} (prioritas intervensi)\\nWaktu: {{ $json.waktu_format }}",
+        "additionalFields": {}
+      },
+      "id": "b2000000-0000-4000-8000-000000000007",
+      "name": "Telegram (isi token & chat id)",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        840,
+        60
+      ],
+      "disabled": true,
+      "notes": "Nonaktif secara bawaan: isi kredensial bot Telegram dan chatId, lalu aktifkan."
+    },
+    {
+      "parameters": {},
+      "id": "b2000000-0000-4000-8000-000000000008",
+      "name": "Tidak ada skor kritis",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        840,
+        220
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule */10 menit": {
+      "main": [
+        [
+          {
+            "node": "Ambil /api/pemantauan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil /api/pemantauan": {
+      "main": [
+        [
+          {
+            "node": "Pecah Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pecah Data": {
+      "main": [
+        [
+          {
+            "node": "Rapikan Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rapikan Data": {
+      "main": [
+        [
+          {
+            "node": "Kritis? (<13)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kritis? (<13)": {
+      "main": [
+        [
+          {
+            "node": "Catat skor kritis",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Telegram (isi token & chat id)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tidak ada skor kritis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Jakarta",
+    "saveManualExecutions": true,
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

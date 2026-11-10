@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Hasil kuesioner SUS - Rapor Usaha</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400..700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/forms.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten</a>
+  <div class="shell">
+    <header id="site-header" class="rail"></header>
+    <div class="stage">
+      <main id="main" tabindex="-1">
+
+        <div class="page-head">
+          <div>
+            <h1 id="headline">Memuat...</h1>
+            <p class="sub" id="sub-headline"></p>
+            <p class="sub"><span id="s-n"></span><span class="dot" aria-hidden="true"></span><span>Pembanding: rata-rata global 68, target modul 80</span></p>
+          </div>
+          <div class="actions">
+            <a class="btn btn-outline" id="btn-csv" href="/api/sus?format=csv" hidden><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-unduh"></use></svg> Unduh CSV</a>
+          </div>
+        </div>
+        <div id="status-area" aria-live="polite"></div>
+        <div id="isi" hidden>
+          <section class="kpis" aria-label="Ringkasan angka">
+            <div class="kpi"><p class="kpi-label">Responden</p><p class="kpi-val" id="k-n">-</p><p class="kpi-sub" id="k-n-sub"></p></div>
+            <div class="kpi"><p class="kpi-label">Skor rata-rata iterasi terakhir</p><p class="kpi-val" id="k-rata">-</p><p class="kpi-sub" id="k-rata-sub"></p></div>
+            <div class="kpi" id="k-target-box"><p class="kpi-label">Selisih terhadap target 80</p><p class="kpi-val" id="k-target">-</p><p class="kpi-sub" id="k-target-sub"></p></div>
+            <div class="kpi"><p class="kpi-label">Iterasi terkumpul</p><p class="kpi-val" id="k-iter">-</p><p class="kpi-sub" id="k-iter-sub"></p></div>
+          </section>
+          <div class="stack-lg">
+            <section class="card" aria-labelledby="h-iter">
+              <div class="card-head"><h2 id="h-iter">Skor rata-rata per iterasi</h2><span class="note">Skala 0&ndash;100</span></div>
+              <div id="iter-isi"></div>
+            </section>
+            <div class="grid-2">
+              <section class="card" aria-labelledby="h-butir">
+                <div class="card-head"><h2 id="h-butir">Rata-rata per butir</h2><span class="note">Jawaban 1&ndash;5</span></div>
+                <div class="card-body" id="butir-isi"></div>
+              </section>
+              <section class="card" aria-labelledby="h-rumus">
+                <div class="card-head"><h2 id="h-rumus">Cara menghitung skor SUS</h2></div>
+                <div class="card-body">
+                  <ol class="rumus">
+                    <li>Butir ganjil (1, 3, 5, 7, 9) bernada positif: skor = <code>jawaban &minus; 1</code>.</li>
+                    <li>Butir genap (2, 4, 6, 8, 10) bernada negatif: skor = <code>5 &minus; jawaban</code>.</li>
+                    <li>Jumlahkan kesepuluh skor (0&ndash;40), lalu kalikan <code>2,5</code> sehingga hasilnya 0&ndash;100.</li></ol>
+                </div>
+              </section>
+            </div>
+            <section class="card" aria-labelledby="h-resp">
+              <div class="card-head"><h2 id="h-resp">Daftar responden</h2></div>
+              <div id="resp-isi"></div>
+            </section>
+          </div>
+        </div>
+        <section class="card share-card" aria-labelledby="h-share">
+          <div class="card-head"><h2 id="h-share">Bagikan kuesioner</h2></div>
+          <div class="card-body share-grid">
+            <div class="field"><label for="share-iterasi">Iterasi</label><input type="number" id="share-iterasi" min="1" value="1"></div>
+            <div class="copy-row"><label for="share-link" class="sr-only">Tautan kuesioner</label><input type="text" id="share-link" readonly>
+              <button type="button" class="btn btn-primary" id="btn-salin"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-salin"></use></svg> Salin tautan</button></div>
+          </div>
+        </section>
+      </main>
+      <footer id="site-footer" class="sitefoot"></footer>
+    </div>
+  </div>
+  <script type="module" src="/js/sus-hasil.js"></script>
+</body>
+</html>

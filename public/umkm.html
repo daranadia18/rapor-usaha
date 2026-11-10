@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Daftar UMKM - Rapor Usaha</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400..700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/data.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten</a>
+  <div class="shell">
+    <header id="site-header" class="rail"></header>
+    <div class="stage">
+      <main id="main" tabindex="-1">
+
+        <div class="page-head">
+          <div>
+            <h1>Daftar UMKM</h1>
+            <p class="sub"><span id="s-n">Memuat daftar...</span><span class="dot" aria-hidden="true"></span><span>Sumber: data contoh modul</span></p>
+          </div>
+          <div class="actions">
+            <a class="btn btn-outline" id="btn-csv" href="/api/umkm?format=csv" hidden><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-unduh"></use></svg> Unduh CSV</a>
+            <a class="btn btn-primary" href="/prediksi"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-tambah"></use></svg> Penilaian baru</a>
+          </div>
+        </div>
+        <section class="card" aria-label="Daftar UMKM">
+          <div class="toolbar">
+            <form class="filters" id="filter-form" role="search" aria-label="Filter UMKM">
+              <div class="field grow"><label for="f-q">Cari nama atau ID</label><input type="search" id="f-q" placeholder="mis. Warung atau UMKM001" autocomplete="off"></div>
+              <div class="field"><label for="f-sektor">Sektor</label><select id="f-sektor"><option value="">Semua sektor</option></select></div>
+              <div class="field"><label for="f-kota">Kota</label><select id="f-kota"><option value="">Semua kota</option></select></div>
+              <p class="count" id="jumlah" aria-live="polite"></p>
+            </form>
+          </div>
+          <div id="daftar"></div>
+          <div class="card-foot"><div class="meter-legend" aria-label="Cara membaca posisi skor"><span><i class="lg-now"></i>skor terakhir</span><span><i class="lg-prev"></i>skor sebelumnya</span><span><i class="sw st-KURANG_SEHAT"></i>Prioritas Intervensi &le; 12</span><span><i class="sw st-CUKUP_SEHAT"></i>Perlu Intervensi 13&ndash;18</span><span><i class="sw st-SEHAT"></i>Perlu Perhatian 19&ndash;24</span><span><i class="sw st-SANGAT_SEHAT"></i>Best Practice &ge; 25</span></div><p>Posisi skor: batang 6&ndash;30 dibagi empat status, dibaca dari kiri (terburuk) ke kanan (terbaik).</p></div>
+        </section>
+      </main>
+      <footer id="site-footer" class="sitefoot"></footer>
+    </div>
+  </div>
+  <script type="module" src="/js/umkm.js"></script>
+</body>
+</html>

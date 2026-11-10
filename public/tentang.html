@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Tentang &amp; Arsitektur - Rapor Usaha</title>
+  <meta name="description" content="Arsitektur, kontrak API, uji nilai batas, dan keterlacakan kebutuhan pengguna Rapor Usaha.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400..700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten</a>
+  <div class="shell">
+    <header id="site-header" class="rail"></header>
+    <div class="stage">
+      <main id="main" tabindex="-1">
+        <div class="page-head">
+          <div>
+            <h1>Arsitektur dan cara kerja Rapor Usaha</h1>
+            <p class="sub"><span>Aliran data, kontrak API, uji nilai batas, dan keterlacakan kebutuhan</span><span class="dot" aria-hidden="true"></span><span>Sumber: modul perkuliahan</span></p>
+          </div>
+        </div>
+
+        <div class="doc">
+          <section class="card" aria-labelledby="h-tujuan">
+            <div class="card-head"><h2 id="h-tujuan">Tujuan</h2></div>
+            <div class="card-body prose">
+              <p>Rapor Usaha membantu pendamping melihat UMKM mana yang perlu intervensi. Enam faktor dinilai 1&ndash;5, dijumlahkan menjadi total 6&ndash;30, lalu ditempatkan pada empat status. Halaman ini merangkum bagaimana data mengalir dari browser sampai database, kontrak API, uji nilai batas, dan keterlacakan kebutuhan pengguna.</p>
+            </div>
+          </section>
+
+          <section class="card" aria-labelledby="h-arsitektur">
+            <div class="card-head"><h2 id="h-arsitektur">Arsitektur</h2></div>
+            <div class="card-body">
+              <div class="diagram" role="img" aria-label="Diagram: Browser memanggil Vercel Functions, yang membaca dan menulis PostgreSQL. Jalur putus-putus: Vercel Functions ke n8n Webhook dan Schedule, lalu ke PostgreSQL, direncanakan nanti.">
+                <p class="diagram-label">Sekarang</p>
+                <div class="diagram-row">
+                  <div class="node">Browser<small>HTML + JS + SVG</small></div><div class="arrow" aria-hidden="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-panah"></use></svg></div>
+                  <div class="node">Vercel Functions<small>Node.js, folder <code>api/</code></small></div><div class="arrow" aria-hidden="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-panah"></use></svg></div>
+                  <div class="node">PostgreSQL<small>umkm, survei, prediksi_log, sus_respons</small></div>
+                </div>
+                <p class="diagram-label">Nanti (tahap n8n)</p>
+                <div class="diagram-row">
+                  <div class="node future">Vercel Functions<small>mode <code>n8n</code></small></div><div class="arrow" aria-hidden="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-panah"></use></svg></div>
+                  <div class="node future">n8n Webhook / Schedule<small>Code node + Respond to Webhook</small></div><div class="arrow" aria-hidden="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-panah"></use></svg></div>
+                  <div class="node future">PostgreSQL<small>prediksi_log, ringkasan berkala</small></div>
+                </div>
+              </div>
+              <p class="small muted prose" style="margin:14px 0 0">Jalur putus-putus belum aktif. Saat variabel <code>N8N_WEBHOOK_URL</code> diisi, permintaan prediksi diteruskan ke n8n; jika kosong, perhitungan dilakukan langsung (mesin <code>lokal</code>).</p>
+            </div>
+          </section>
+
+          <section class="card" aria-labelledby="h-api">
+            <div class="card-head"><h2 id="h-api">Ringkasan kontrak API</h2></div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Endpoint</th><th>Metode</th><th>Akses</th><th>Fungsi</th></tr></thead>
+              <tbody>
+                <tr><td><code>/api/auth/:aksi</code></td><td>POST/GET</td><td>publik</td><td>login admin, logout, me (cookie httpOnly); daftar admin wajib kode undangan</td></tr>
+                <tr><td><code>/api/predict</code></td><td>POST</td><td>publik</td><td>hitung status dari 6 faktor, simpan survei, catat log</td></tr>
+                <tr><td><code>/api/ringkasan</code></td><td>GET</td><td>publik</td><td>KPI, distribusi status, rata faktor, daftar prioritas</td></tr>
+                <tr><td><code>/api/umkm</code>, <code>/api/umkm/:id</code></td><td>GET/POST</td><td>publik (CSV: admin)</td><td>daftar, profil, riwayat, perbandingan, tambah UMKM</td></tr>
+                <tr><td><code>/api/pemantauan</code></td><td>GET</td><td>publik</td><td>UMKM prioritas intervensi</td></tr>
+                <tr><td><code>/api/log</code></td><td>GET</td><td>admin</td><td>log prediksi berpaginasi + CSV</td></tr>
+                <tr><td><code>/api/sus</code></td><td>POST/GET</td><td>POST publik, GET admin</td><td>kirim dan rekap kuesioner SUS</td></tr>
+                <tr><td><code>/api/health</code></td><td>GET</td><td>publik</td><td>cek layanan dan database</td></tr>
+              </tbody></table></div>
+            <div class="card-foot"><p>Respons sukses <code>{"success":true,"data":...}</code>; gagal <code>{"success":false,"errors":[...]}</code> dengan kode 400/401/403/404/409/500.</p></div>
+          </section>
+
+          <section class="card" aria-labelledby="h-curl">
+            <div class="card-head"><h2 id="h-curl">Contoh curl</h2><span class="note">Endpoint prediksi terbuka untuk umum</span></div>
+            <div class="card-body">
+              <p class="muted prose">Prediksi bisa dipanggil tanpa login. Login admin hanya perlu untuk log, hasil SUS, dan unduhan CSV.</p>
+              <h3>Login admin (simpan cookie, untuk log dan CSV)</h3>
+              <div class="code-block"><button type="button" class="btn btn-outline btn-sm copy-btn" data-copy="curl-login"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-salin"></use></svg> Salin</button><pre id="curl-login"></pre></div>
+              <h3>POST /api/predict</h3>
+              <div class="code-block"><button type="button" class="btn btn-outline btn-sm copy-btn" data-copy="curl-predict"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-salin"></use></svg> Salin</button><pre id="curl-predict"></pre></div>
+              <h3>GET /api/ringkasan</h3>
+              <div class="code-block"><button type="button" class="btn btn-outline btn-sm copy-btn" data-copy="curl-ringkasan"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-salin"></use></svg> Salin</button><pre id="curl-ringkasan"></pre></div>
+            </div>
+          </section>
+
+          <section class="card" aria-labelledby="h-batas">
+            <div class="card-head"><h2 id="h-batas">Uji nilai batas</h2><span class="note">Ambang status 13 / 19 / 25</span></div>
+            <div class="card-body">
+              <p class="muted prose">Total skor yang diuji pada batas tiap status, dan masukan tidak valid yang harus ditolak (HTTP 400).</p>
+              <div class="table-wrap"><table>
+                <thead><tr><th class="num">Total skor</th><th>Status yang diharapkan</th><th>Label</th></tr></thead>
+                <tbody id="tbody-batas"></tbody></table></div>
+              <div class="table-wrap"><table>
+                <thead><tr><th>Masukan tidak valid</th><th>Hasil</th></tr></thead>
+                <tbody>
+                  <tr><td>Skor faktor 0 atau 6 (di luar 1&ndash;5)</td><td>400 &quot;&lt;faktor&gt; harus bilangan bulat 1-5&quot;</td></tr>
+                  <tr><td>Skor faktor desimal (mis. 3,5) atau teks</td><td>400 &quot;&lt;faktor&gt; harus bilangan bulat 1-5&quot;</td></tr>
+                  <tr><td>Faktor tidak dikirim</td><td>400</td></tr>
+                  <tr><td><code>id_umkm</code> bukan format UMKMxxx</td><td>400 &quot;id_umkm harus berformat UMKMxxx&quot;</td></tr>
+                </tbody></table></div>
+            </div>
+          </section>
+
+          <section class="card" aria-labelledby="h-ucd">
+            <div class="card-head"><h2 id="h-ucd">Keterlacakan kebutuhan (UCD)</h2></div>
+            <div class="table-wrap"><table class="table-stack">
+              <thead><tr><th>Kebutuhan</th><th>Uraian</th><th>Fitur</th><th>Metrik (target)</th></tr></thead>
+              <tbody>
+                <tr><td data-label="Kebutuhan"><strong>K1</strong></td><td data-label="Uraian">Hasil muncul segera setelah formulir dikirim</td><td data-label="Fitur"><a href="/prediksi">Penilaian</a></td><td data-label="Metrik">Response time &lt; 500 ms</td></tr>
+                <tr><td data-label="Kebutuhan"><strong>K2</strong></td><td data-label="Uraian">Ringkasan responden tanpa Excel manual</td><td data-label="Fitur"><a href="/dashboard">Dashboard</a></td><td data-label="Metrik">2&ndash;3 hari menjadi &lt; 1 detik</td></tr>
+                <tr><td data-label="Kebutuhan"><strong>K3</strong></td><td data-label="Uraian">Formulir mudah dipahami</td><td data-label="Fitur">Pilihan skor 1&ndash;5 + penjelasan, <a href="/sus">SUS</a></td><td data-label="Metrik">Skor SUS &ge; 80</td></tr>
+                <tr><td data-label="Kebutuhan"><strong>K4</strong></td><td data-label="Uraian">Rekomendasi tindak lanjut</td><td data-label="Fitur">Rekomendasi &amp; faktor terlemah</td><td data-label="Metrik">Akurasi status 100% pada uji batas</td></tr>
+                <tr><td data-label="Kebutuhan"><strong>K5</strong></td><td data-label="Uraian">Hasil dapat ditelusuri dan diaudit</td><td data-label="Fitur">Log prediksi</td><td data-label="Metrik">100% prediksi tercatat</td></tr>
+              </tbody></table></div>
+            <div class="card-foot"><p>Semua metrik adalah target; hasil pengukuran diisi setelah pengujian.</p></div>
+          </section>
+
+          <section class="card" aria-labelledby="h-kredit">
+            <div class="card-head"><h2 id="h-kredit">Kredit</h2></div>
+            <div class="card-body prose">
+              <p>Proyek mata kuliah <em>Otomasi Alur Data dan Dashboard Berpusat Pengguna</em> (D3). Studi kasus Dashboard Kesehatan UMKM mengikuti modul perkuliahan. Rancangan antarmuka terinspirasi dari proyek referensi <code>Deswitaak/sisehat</code> namun dibuat ulang dari nol: kode, gaya visual, dan struktur datanya berbeda dan tidak disalin. Grafik digambar sendiri dengan SVG; huruf Hanken Grotesk.</p>
+            </div>
+          </section>
+        </div>
+      </main>
+      <footer id="site-footer" class="sitefoot"></footer>
+    </div>
+  </div>
+  <script type="module" src="/js/tentang.js"></script>
+</body>
+</html>

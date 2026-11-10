@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Perbandingan UMKM - Rapor Usaha</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400..700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/data.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten</a>
+  <div class="shell">
+    <header id="site-header" class="rail"></header>
+    <div class="stage">
+      <main id="main" tabindex="-1">
+
+        <div class="page-head">
+          <div>
+            <h1>Perbandingan UMKM</h1>
+            <p class="sub">Bandingkan enam faktor sebuah UMKM dengan rata-rata sektornya, atau dengan UMKM lain. Sumber: data contoh modul.</p>
+          </div>
+        </div>
+        <div id="status-area" aria-live="polite"></div>
+        <section class="card" id="form-pilih" aria-labelledby="h-pilih" hidden>
+          <div class="card-head">
+            <h2 id="h-pilih">Pilih UMKM</h2>
+            <div class="pick-form">
+              <div class="field"><label for="p-a">UMKM A</label><select id="p-a"></select></div>
+              <div class="field"><label for="p-b">UMKM B (opsional)</label><select id="p-b"></select></div>
+            </div>
+          </div>
+        </section>
+        <div id="hasil" aria-live="polite" style="margin-top:20px"></div>
+      </main>
+      <footer id="site-footer" class="sitefoot"></footer>
+    </div>
+  </div>
+  <script type="module" src="/js/perbandingan.js"></script>
+</body>
+</html>

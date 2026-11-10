@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Pemantauan - Rapor Usaha</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400..700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/data.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten</a>
+  <div class="shell">
+    <header id="site-header" class="rail"></header>
+    <div class="stage">
+      <main id="main" tabindex="-1">
+
+        <div class="page-head">
+          <div>
+            <h1>Pemantauan intervensi</h1>
+            <p class="sub"><span id="headline">Memuat...</span><span class="dot" aria-hidden="true"></span><span id="s-waktu"></span><span class="dot" aria-hidden="true"></span><span>Sumber: data contoh modul</span></p>
+            <p class="change-line" id="change" hidden></p>
+          </div>
+          <div class="actions">
+            <button type="button" class="btn btn-outline" id="btn-segarkan"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-muat"></use></svg> Muat ulang</button>
+          </div>
+        </div>
+        <div id="status-area" aria-live="polite"></div>
+        <div id="isi" hidden>
+          <section class="kpis" aria-label="Ringkasan pemantauan">
+            <div class="kpi alert"><p class="kpi-label">Perlu tindak lanjut</p><p class="kpi-val" id="k-total">-</p><p class="kpi-sub">Survei terakhir berstatus Perlu atau Prioritas Intervensi</p></div>
+            <div class="kpi"><p class="kpi-label">Kurang Sehat</p><p class="kpi-val" id="k-kurang">-</p><p class="kpi-sub">Prioritas utama</p></div>
+            <div class="kpi"><p class="kpi-label">Cukup Sehat</p><p class="kpi-val" id="k-cukup">-</p><p class="kpi-sub">Perlu dipantau</p></div>
+            <div class="kpi"><p class="kpi-label">Turun sejak survei sebelumnya</p><p class="kpi-val" id="k-turun">-</p><p class="kpi-sub">Dari daftar tindak lanjut</p></div>
+          </section>
+          <section class="card" aria-labelledby="h-tindak">
+            <div class="card-head"><h2 id="h-tindak">Daftar tindak lanjut</h2><span class="note">Status paling berat dulu, lalu penurunan terbesar</span></div>
+            <div id="daftar"></div>
+            <div class="card-foot"><div class="meter-legend" aria-label="Cara membaca posisi skor"><span><i class="lg-now"></i>skor terakhir</span><span><i class="lg-prev"></i>skor sebelumnya</span><span><i class="sw st-KURANG_SEHAT"></i>Prioritas Intervensi &le; 12</span><span><i class="sw st-CUKUP_SEHAT"></i>Perlu Intervensi 13&ndash;18</span><span><i class="sw st-SEHAT"></i>Perlu Perhatian 19&ndash;24</span><span><i class="sw st-SANGAT_SEHAT"></i>Best Practice &ge; 25</span></div><p>Berdasarkan survei terakhir tiap UMKM berstatus Cukup Sehat atau Kurang Sehat.</p></div>
+          </section>
+        </div>
+      </main>
+      <footer id="site-footer" class="sitefoot"></footer>
+    </div>
+  </div>
+  <script type="module" src="/js/pemantauan.js"></script>
+</body>
+</html>

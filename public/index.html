@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Rapor Usaha - kesehatan usaha dari enam skor</title>
+  <meta name="description" content="Enam faktor dinilai 1 sampai 5, dijumlahkan, lalu ditempatkan pada empat status. Pendamping tahu UMKM mana yang perlu intervensi dalam hitungan detik.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400..700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten</a>
+  <div class="shell">
+    <header id="site-header" class="rail"></header>
+    <div class="stage">
+      <main id="main" tabindex="-1">
+
+        <section class="l-sus" aria-labelledby="h-sus">
+          <div>
+            <h2 id="h-sus">Bantu kami menguji aplikasi ini</h2>
+            <p>Isi kuesioner SUS, sekitar 2 menit. Tanpa login, jawaban Anda membantu menilai kemudahan penggunaan.</p>
+          </div>
+          <a class="btn btn-primary btn-lg" href="/sus">Isi kuesioner SUS</a>
+        </section>
+
+        <section class="l-hero" aria-labelledby="h-hero">
+          <div>
+            <h1 id="h-hero">Pendamping langsung tahu UMKM mana yang perlu intervensi.</h1>
+            <p class="lead">Enam skor 1&ndash;5 dijumlahkan menjadi satu status. Rekap Excel yang memakan 2&ndash;3 hari selesai begitu survei disimpan.</p>
+            <div class="row">
+              <a class="btn btn-primary btn-lg" href="/dashboard">Buka dashboard</a>
+              <a class="btn btn-outline btn-lg" href="/prediksi">Penilaian baru</a>
+            </div>
+          </div>
+
+          <div class="l-preview">
+            <div class="card">
+              <div class="card-head"><h2>Daftar prioritas</h2><span class="tag">Contoh data</span></div>
+              <div class="table-wrap"><table class="table-stack">
+                <caption class="sr-only">Contoh daftar prioritas dengan tiga UMKM fiktif</caption>
+                <thead><tr><th scope="col">UMKM</th><th scope="col">Posisi skor</th><th scope="col" class="num">Total /30</th><th scope="col">Status</th><th scope="col">Perubahan</th></tr></thead>
+                <tbody>
+                  <tr><td class="cell-name cell-first" data-label="UMKM">Warung Contoh A</td><td data-label="Posisi skor" data-mini="18,13"></td><td class="num total" data-label="Total /30">13</td><td data-label="Status"><span class="chip st-CUKUP_SEHAT">Cukup Sehat</span></td><td data-label="Perubahan" data-delta="-5"></td></tr>
+                  <tr><td class="cell-name cell-first" data-label="UMKM">Kriya Contoh B</td><td data-label="Posisi skor" data-mini="12,15"></td><td class="num total" data-label="Total /30">15</td><td data-label="Status"><span class="chip st-CUKUP_SEHAT">Cukup Sehat</span></td><td data-label="Perubahan" data-delta="3"></td></tr>
+                  <tr><td class="cell-name cell-first" data-label="UMKM">Kopi Contoh C</td><td data-label="Posisi skor" data-mini="15,19,22"></td><td class="num total" data-label="Total /30">22</td><td data-label="Status"><span class="chip st-SEHAT">Sehat</span></td><td data-label="Perubahan" data-delta="3"></td></tr>
+                </tbody></table></div>
+              <div class="card-foot"><p>Data fiktif untuk ilustrasi. Terburuk ditampilkan lebih dulu.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="l-how" aria-labelledby="h-cara">
+          <h2 id="h-cara">Cara kerja</h2>
+          <p class="lead">Aturan penilaian terbuka dan sama untuk semua UMKM.</p>
+          <div class="l-flow">
+            <div>
+              <h3>Enam faktor</h3>
+              <p>Tiap faktor diberi skor 1&ndash;5 dengan penjelasan di setiap tingkat.</p>
+              <div class="tags"><span class="tag">Sumber Daya</span><span class="tag">Kepemimpinan</span><span class="tag">Lingkungan Kerja</span><span class="tag">Nilai Organisasi</span><span class="tag">Stabilitas</span><span class="tag">Kinerja</span></div>
+            </div>
+            <div>
+              <h3>Total 6&ndash;30</h3>
+              <p>Keenam skor dijumlahkan. Satu angka menggambarkan kesehatan usaha pada survei itu.</p>
+              <div class="big">4 + 5 + 3 + 4 + 4 + 5 = 25</div>
+            </div>
+            <div>
+              <h3>Empat status</h3>
+              <p>Total ditempatkan pada pita status. Titik terakhir diberi tanda naik atau turun, sehingga penurunan terlihat lebih awal.</p>
+            </div>
+          </div>
+          <ul class="band-key band-strip" aria-label="Empat status dan ambang skornya">
+            <li class="st-KURANG_SEHAT"><b>&le; 12</b><span>Kurang Sehat<small>Prioritas Intervensi</small></span></li>
+            <li class="st-CUKUP_SEHAT"><b>13&ndash;18</b><span>Cukup Sehat<small>Perlu Intervensi</small></span></li>
+            <li class="st-SEHAT"><b>19&ndash;24</b><span>Sehat<small>Perlu Perhatian</small></span></li>
+            <li class="st-SANGAT_SEHAT"><b>&ge; 25</b><span>Sangat Sehat<small>Best Practice</small></span></li>
+          </ul>
+        </section>
+
+        <section class="l-close" aria-labelledby="h-tutup">
+          <div>
+            <h2 id="h-tutup">Coba sekarang</h2>
+            <p>Dashboard, penilaian, dan kuesioner SUS terbuka untuk siapa saja. Login hanya untuk admin.</p>
+          </div>
+          <div class="row">
+            <a class="btn btn-primary btn-lg" href="/sus">Isi kuesioner SUS</a>
+            <a class="btn btn-outline btn-lg" href="/dashboard">Buka dashboard</a>
+            <a class="btn btn-ghost btn-lg" href="/tentang">Lihat arsitektur</a>
+          </div>
+        </section>
+      </main>
+      <footer id="site-footer" class="sitefoot"></footer>
+    </div>
+  </div>
+  <script type="module" src="/js/landing.js"></script>
+</body>
+</html>

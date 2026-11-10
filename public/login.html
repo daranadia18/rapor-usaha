@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Masuk admin - Rapor Usaha</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400..700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten</a>
+  <div class="shell">
+    <header id="site-header" class="rail"></header>
+    <div class="stage">
+      <main id="main" tabindex="-1">
+
+        <div class="auth-box">
+          <div class="auth-brand"><img src="/favicon.svg" alt="" width="36" height="36"><span>Rapor Usaha</span></div>
+          <div class="auth-intro"><h1>Masuk admin</h1><p>Hanya admin yang perlu masuk; dashboard, penilaian, dan kuesioner SUS terbuka untuk siapa saja. <a href="/dashboard">Kembali ke Dashboard</a></p></div>
+          <form id="form-login" novalidate>
+            <div id="form-alert" aria-live="assertive"></div>
+            <div class="field"><label for="email">Email</label>
+              <input type="email" id="email" name="email" autocomplete="email" required>
+              <div class="field-error" id="err-email" hidden></div></div>
+            <div class="field"><label for="password">Kata sandi</label>
+              <div class="input-group"><input type="password" id="password" name="password" autocomplete="current-password" required>
+                <button type="button" class="btn btn-outline btn-sm" data-toggle-pw aria-controls="password" aria-pressed="false">Tampilkan</button></div>
+              <div class="field-error" id="err-password" hidden></div></div>
+            <button class="btn btn-primary btn-lg btn-block" type="submit" id="btn-submit">Masuk</button>
+            <p class="auth-switch">Punya kode undangan admin? <a href="/register">Daftar admin</a></p>
+          </form>
+        </div>
+      </main>
+      <footer id="site-footer" class="sitefoot"></footer>
+    </div>
+  </div>
+  <script type="module" src="/js/login.js"></script>
+</body>
+</html>

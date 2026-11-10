@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Kuesioner SUS - Rapor Usaha</title>
+  <meta name="description" content="Kuesioner System Usability Scale (SUS) untuk menilai kemudahan penggunaan Rapor Usaha.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400..700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/forms.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten</a>
+  <div class="shell">
+    <header id="site-header" class="rail"></header>
+    <div class="stage">
+      <main id="main" tabindex="-1">
+
+        <div class="sus-wrap">
+          <div id="bagian-form">
+            <div class="page-head">
+              <div>
+                <h1>Kuesioner kegunaan (SUS)</h1>
+                <p class="sub"><span>Isi setelah mencoba aplikasi, sekitar 2 menit</span><span class="dot" aria-hidden="true"></span><span>Boleh anonim</span></p>
+              </div>
+            </div>
+            <form id="form-sus" novalidate>
+              <div id="form-alert" aria-live="assertive"></div>
+              <input type="hidden" id="iterasi" name="iterasi" value="1">
+              <section class="card" aria-labelledby="h-responden">
+                <div class="card-head"><h2 id="h-responden">Tentang Anda</h2><p class="sus-meta">Iterasi: <strong id="label-iterasi">1</strong></p></div>
+                <div class="card-body">
+                  <p class="muted small">Bantu kami menilai seberapa mudah Rapor Usaha dipakai. Nama dan peran boleh dikosongkan.</p>
+                  <div class="sus-fields">
+                    <div class="field"><label for="nama">Nama (opsional)</label><input type="text" id="nama" autocomplete="name"></div>
+                    <div class="field"><label for="peran">Peran (opsional)</label><input type="text" id="peran" placeholder="mis. mahasiswa, pemilik usaha, pendamping"></div>
+                  </div>
+                </div>
+              </section>
+              <div class="progress" aria-hidden="false"><span id="prog-teks">0/10 terjawab</span><span class="progress-bar" aria-hidden="true"><i id="prog-bar"></i></span></div>
+              <section class="card" aria-labelledby="h-butir">
+                <div class="card-head"><h2 id="h-butir">Sepuluh pernyataan</h2></div>
+                <p class="sus-guide">Pilih satu jawaban untuk setiap pernyataan, dari Sangat tidak setuju sampai Sangat setuju. Semua butir wajib diisi.</p>
+                <div id="butir"></div>
+                <div class="sus-submit"><button type="submit" class="btn btn-primary btn-lg btn-block" id="btn-kirim">Kirim jawaban</button></div>
+              </section>
+            </form>
+          </div>
+          <div id="bagian-terima" class="card sus-thanks" hidden tabindex="-1">
+            <div class="card-body">
+              <h1>Terima kasih</h1>
+              <p class="lead">Jawaban Anda sudah tersimpan dan membantu kami memperbaiki aplikasi ini.</p>
+              <p class="sus-score" id="skor-netral"></p>
+              <div><a class="btn btn-outline" href="/">Kembali ke Beranda</a></div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <footer id="site-footer" class="sitefoot"></footer>
+    </div>
+  </div>
+  <script type="module" src="/js/sus.js"></script>
+</body>
+</html>

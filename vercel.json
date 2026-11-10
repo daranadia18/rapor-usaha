@@ -1,0 +1,17 @@
+{
+  "cleanUrls": true,
+  "outputDirectory": "public",
+  "rewrites": [
+    { "source": "/api/auth/:action", "destination": "/api/auth?action=:action" },
+    { "source": "/api/umkm/:id", "destination": "/api/umkm?id=:id" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ]
+}
