@@ -388,10 +388,12 @@ svg.bt text { line-height: 1.4; }
 .fbar-avg { position: absolute; top: -5px; bottom: -5px; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--ink); }
 .fbar-axis { display: grid; grid-template-columns: var(--nm, 124px) minmax(0, 1fr) 46px; gap: 12px; font-size: .76rem; color: var(--muted); }
 .fbar-axis div { position: relative; height: 18px; }
-.fbar-axis > div > span { position: absolute; top: 2px; transform: translateX(-100%); }
+.fbar-axis > div > span { position: absolute; top: 2px; transform: translateX(-50%); }
 .fbar .flag { display: block; font-size: .78rem; font-weight: 600; line-height: 1.35; color: var(--st-cukup-ink); }
 .legend-line { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .84rem; color: var(--muted); margin-top: 10px; }
 .legend-line i { display: inline-block; vertical-align: middle; margin-right: 6px; }
+.banding-ringkas { margin: 16px 0 0; }
+.banding-ringkas:first-child { margin-top: 0; }
 .lg-avg { width: 2px; height: 12px; border-radius: 1px; background: var(--ink); }
 .lg-bar { width: 14px; height: 8px; border-radius: 999px; background: var(--bar); }
 .lg-weak { width: 14px; height: 8px; border-radius: 999px; background: var(--bar-weak); }

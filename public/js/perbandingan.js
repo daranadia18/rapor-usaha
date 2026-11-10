@@ -51,34 +51,38 @@ function gambar(a, b) {
     return;
   }
   const pb = b ? b.perbandingan : null;
-  const bawah = FAKTOR.filter(f => Number(pa.skor_terakhir[f.key]) < Number(pa.rata_sektor[f.key]));
-  const barisA = FAKTOR.map(f => {
-    const v = Number(pa.skor_terakhir[f.key]), r = Number(pa.rata_sektor[f.key]);
+  // Baris batang + kalimat ringkas untuk satu UMKM (dipakai A dan B, supaya keduanya diperlakukan sama)
+  const baris = p => FAKTOR.map(f => {
+    const v = Number(p.skor_terakhir[f.key]), r = Number(p.rata_sektor[f.key]);
     return { nama: f.nama, nilai: v, rata: r, flag: v < r ? 'di bawah rata-rata sektor' : '' };
   });
-  const barisB = pb ? FAKTOR.map(f => ({ nama: f.nama, nilai: Number(pb.skor_terakhir[f.key]), rata: Number(pb.rata_sektor[f.key]) })) : null;
+  const ringkas = p => {
+    const bawah = baris(p).filter(r => r.flag);
+    return `<p class="banding-ringkas">${bawah.length
+      ? `Di bawah rata-rata sektor: <strong>${bawah.map(r => esc(r.nama)).join(', ')}</strong>. Mulai perbaikan dari faktor ini.`
+      : 'Semua faktor sama dengan atau di atas rata-rata sektor.'}</p>`;
+  };
+  const barisA = baris(pa);
+  const barisB = pb ? baris(pb) : null;
 
-  const legenda = (u, tampilSektor = true) => `<div class="legend-line"><span><i class="lg-bar"></i>${esc(u.umkm.nama_umkm)}</span><span><i class="lg-avg"></i>Rata-rata sektor ${esc(u.umkm.nama_sektor)}</span></div>`;
+  const legenda = u => `<div class="legend-line"><span><i class="lg-bar"></i>${esc(u.umkm.nama_umkm)}</span><span><i class="lg-avg"></i>Rata-rata sektor ${esc(u.umkm.nama_sektor)}</span></div>`;
   hasil.innerHTML = `
     <section class="kpis" aria-label="Ringkasan perbandingan">
       <div class="kpi"><p class="kpi-label">Peringkat ${esc(a.umkm.nama_umkm)}</p><p class="kpi-val">${fmtNum(pa.peringkat)}<small>dari ${fmtNum(pa.dari)} UMKM</small></p></div>
       <div class="kpi"><p class="kpi-label">Total A</p><p class="kpi-val">${fmtNum(pa.skor_terakhir.total_skor, 1)}<small>/ 30</small></p></div>
-      <div class="kpi"><p class="kpi-label">Rata-rata sektor</p><p class="kpi-val">${fmtNum(pa.rata_sektor.total_skor, 1)}<small>/ 30</small></p></div>
+      <div class="kpi"><p class="kpi-label">Rata-rata sektor ${esc(a.umkm.nama_sektor)}</p><p class="kpi-val">${fmtNum(pa.rata_sektor.total_skor, 1)}<small>/ 30</small></p></div>
       ${pb ? `<div class="kpi"><p class="kpi-label">Total B</p><p class="kpi-val">${fmtNum(pb.skor_terakhir.total_skor, 1)}<small>/ 30</small></p></div>` : ''}
     </section>
     <div class="grid-2">
       <section class="card" aria-labelledby="h-a">
         <div class="card-head"><h2 id="h-a">${esc(a.umkm.nama_umkm)}</h2><span class="note">${esc(a.umkm.nama_sektor)} &middot; skala 1&ndash;5</span></div>
-        <div class="card-body">${faktorBars(barisA, { rataLabel: 'rata-rata sektor', lebarNama: 190 })}${legenda(a)}</div>
+        <div class="card-body">${faktorBars(barisA, { rataLabel: 'rata-rata sektor', lebarNama: 190 })}${legenda(a)}${barisB ? ringkas(pa) : ''}</div>
       </section>
       <section class="card" aria-labelledby="h-ring">
         <div class="card-head"><h2 id="h-ring">${barisB ? esc(b.umkm.nama_umkm) : 'Ringkasan'}</h2>${barisB ? `<span class="note">${esc(b.umkm.nama_sektor)} &middot; skala 1&ndash;5</span>` : ''}</div>
         <div class="card-body">
-          ${barisB ? faktorBars(barisB, { rataLabel: 'rata-rata sektor', lebarNama: 190 }) + legenda(b) : ''}
+          ${barisB ? faktorBars(barisB, { rataLabel: 'rata-rata sektor', lebarNama: 190 }) + legenda(b) + ringkas(pb) : ringkas(pa)}
           ${b && !pb ? `<p class="muted small">${esc(b.umkm.nama_umkm)} belum punya survei sehingga tidak ditampilkan.</p>` : ''}
-          <p style="margin-top:${barisB ? 16 : 0}px">${bawah.length
-            ? `Di bawah rata-rata sektor: <strong>${bawah.map(f => esc(f.nama)).join(', ')}</strong>. Mulai perbaikan dari faktor ini.`
-            : 'Semua faktor sama dengan atau di atas rata-rata sektor.'}</p>
         </div>
         <div class="card-foot"><p>Sumber: data contoh modul, survei terakhir tiap UMKM.</p></div>
       </section>
