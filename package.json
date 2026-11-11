@@ -6,6 +6,7 @@
   "type": "module",
   "engines": { "node": "22.x" },
   "scripts": {
+    "setup": "node scripts/setup.mjs",
     "dev": "node scripts/dev-server.js",
     "test": "node --test",
     "db:init": "node scripts/db-init.js",
