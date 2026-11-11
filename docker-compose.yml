@@ -1,7 +1,10 @@
 name: umkm
 services:
+  # Opsional (dev offline): docker compose --profile localdb up -d
+  # Default proyek memakai Neon (DATABASE_URL), jadi hanya n8n yang dijalankan.
   postgres:
     image: postgres:16
+    profiles: ["localdb"]
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -37,9 +40,6 @@ services:
       N8N_SECURE_COOKIE: "false"
     volumes:
       - n8n_data:/home/node/.n8n
-    depends_on:
-      postgres:
-        condition: service_healthy
 volumes:
   pg_data:
   n8n_data:
