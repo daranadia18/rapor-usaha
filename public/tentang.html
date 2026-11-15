@@ -61,9 +61,9 @@
               <thead><tr><th>Endpoint</th><th>Metode</th><th>Akses</th><th>Fungsi</th></tr></thead>
               <tbody>
                 <tr><td><code>/api/auth/:aksi</code></td><td>POST/GET</td><td>publik</td><td>login admin, logout, me (cookie httpOnly); daftar admin wajib kode undangan</td></tr>
-                <tr><td><code>/api/predict</code></td><td>POST</td><td>publik</td><td>hitung status dari 6 faktor, simpan survei, catat log</td></tr>
+                <tr><td><code>/api/predict</code></td><td>POST</td><td>admin / <code>x-api-key</code></td><td>hitung status dari 6 faktor, simpan survei, catat log</td></tr>
                 <tr><td><code>/api/ringkasan</code></td><td>GET</td><td>publik</td><td>KPI, distribusi status, rata faktor, daftar prioritas</td></tr>
-                <tr><td><code>/api/umkm</code>, <code>/api/umkm/:id</code></td><td>GET/POST</td><td>publik (CSV: admin)</td><td>daftar, profil, riwayat, perbandingan, tambah UMKM</td></tr>
+                <tr><td><code>/api/umkm</code>, <code>/api/umkm/:id</code></td><td>GET/POST</td><td>GET publik; POST &amp; CSV: admin</td><td>daftar, profil, riwayat, perbandingan, tambah UMKM</td></tr>
                 <tr><td><code>/api/pemantauan</code></td><td>GET</td><td>publik</td><td>UMKM prioritas intervensi</td></tr>
                 <tr><td><code>/api/log</code></td><td>GET</td><td>admin</td><td>log prediksi berpaginasi + CSV</td></tr>
                 <tr><td><code>/api/sus</code></td><td>POST/GET</td><td>POST publik, GET admin</td><td>kirim dan rekap kuesioner SUS</td></tr>
@@ -73,10 +73,10 @@
           </section>
 
           <section class="card" aria-labelledby="h-curl">
-            <div class="card-head"><h2 id="h-curl">Contoh curl</h2><span class="note">Endpoint prediksi terbuka untuk umum</span></div>
+            <div class="card-head"><h2 id="h-curl">Contoh curl</h2><span class="note">Penulisan data khusus admin</span></div>
             <div class="card-body">
-              <p class="muted prose">Prediksi bisa dipanggil tanpa login. Login admin hanya perlu untuk log, hasil SUS, dan unduhan CSV.</p>
-              <h3>Login admin (simpan cookie, untuk log dan CSV)</h3>
+              <p class="muted prose">Data dashboard bisa dibaca tanpa login. Penilaian, tambah UMKM, log, hasil SUS, dan unduhan CSV memerlukan login admin (cookie) atau header <code>x-api-key</code> untuk otomasi.</p>
+              <h3>Login admin (simpan cookie)</h3>
               <div class="code-block"><button type="button" class="btn btn-outline btn-sm copy-btn" data-copy="curl-login"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-salin"></use></svg> Salin</button><pre id="curl-login"></pre></div>
               <h3>POST /api/predict</h3>
               <div class="code-block"><button type="button" class="btn btn-outline btn-sm copy-btn" data-copy="curl-predict"><svg class="ic" aria-hidden="true" focusable="false"><use href="/icons.svg#i-salin"></use></svg> Salin</button><pre id="curl-predict"></pre></div>

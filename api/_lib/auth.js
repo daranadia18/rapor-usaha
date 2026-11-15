@@ -96,3 +96,10 @@ export function isApiKey(req) {
   const b = Buffer.from(expected);
   return a.length === b.length && timingSafeEqual(a, b);
 }
+
+// Untuk endpoint yang menulis data: admin yang login, ATAU otomasi dengan header
+// x-api-key = N8N_API_KEY. 401/403 dikirim otomatis bila keduanya tidak terpenuhi.
+export async function requireAdminOrKey(req, res) {
+  if (isApiKey(req)) return { id: null, nama: 'otomasi', role: 'admin', apiKey: true };
+  return requireAdmin(req, res);
+}

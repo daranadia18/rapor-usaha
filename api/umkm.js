@@ -1,6 +1,6 @@
 // /api/umkm (daftar, tambah, CSV) dan /api/umkm/:id (detail via ?id=)
 import { query, withTx } from './_lib/db.js';
-import { requireAdmin } from './_lib/auth.js';
+import { requireAdmin, requireAdminOrKey } from './_lib/auth.js';
 import { handle, allow, ok, fail, qs, readBody, sendCsv } from './_lib/http.js';
 import { FAKTOR, statusFromTotal } from './_lib/predict.js';
 import { jejakUntuk } from './_lib/jejak.js';
@@ -106,8 +106,9 @@ async function detail(req, res, id) {
   ok(res, { umkm: u.rows[0], riwayat, perbandingan });
 }
 
-// ---------- POST /api/umkm ----------
+// ---------- POST /api/umkm (admin / x-api-key) ----------
 async function tambah(req, res) {
+  if (!(await requireAdminOrKey(req, res))) return;
   const b = await readBody(req);
   const errors = [];
   const nama = typeof b.nama_umkm === 'string' ? b.nama_umkm.trim() : '';

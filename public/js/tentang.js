@@ -18,7 +18,7 @@ $('#curl-login').textContent =
   -H "Content-Type: application/json" \\
   -d '{"email":"anda@contoh.com","password":"kata-sandi-anda"}'`;
 $('#curl-predict').textContent =
-`curl -X POST ${o}/api/predict \\
+`curl -b cookies.txt -X POST ${o}/api/predict \\
   -H "Content-Type: application/json" \\
   -d '{"id_umkm":"UMKM001","sumber_daya":4,"kepemimpinan":5,"lingkungan_kerja":4,"nilai_organisasi":5,"stabilitas":4,"kinerja":5}'`;
 $('#curl-ringkasan').textContent = `curl "${o}/api/ringkasan?kota=Jakarta"`;

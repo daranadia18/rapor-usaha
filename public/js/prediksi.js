@@ -1,12 +1,12 @@
-// Penilaian kesehatan UMKM (POST /api/predict, POST /api/umkm).
+// Penilaian kesehatan UMKM (POST /api/predict, POST /api/umkm) - khusus admin.
 // Enam faktor dimulai "belum dinilai"; tombol simpan baru aktif setelah semuanya dinilai.
 import { api } from './api.js';
-import { initPage } from './auth-guard.js';
+import { requireAdmin } from './auth-guard.js';
 import { $, $$, esc, fmtNum, icon, isiSelect, tampilAlert, tampilLoading, tampilGalat, bacaQuery, debounce } from './ui.js';
 import { FAKTOR, NIVEL, STATUS, statusDariTotal, chipHtml } from './status.js';
 import { liveTrackSvg, setLive, bandChart, deltaHtml } from './track.js';
 
-await initPage();
+await requireAdmin();
 document.body.classList.add('pg-nilai');
 
 const muatAwal = $('#muat-awal');

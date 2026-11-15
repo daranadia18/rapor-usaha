@@ -1,6 +1,8 @@
 // POST /api/predict : hitung status kesehatan, simpan survei, catat log.
+// Akses: admin (cookie login) atau otomasi (header x-api-key).
 import { performance } from 'node:perf_hooks';
 import { query } from './_lib/db.js';
+import { requireAdminOrKey } from './_lib/auth.js';
 import { handle, allow, ok, fail, readBody } from './_lib/http.js';
 import { FAKTOR, validate, predict } from './_lib/predict.js';
 
@@ -39,6 +41,7 @@ async function simpanSurvei(b) {
 
 export default handle(async (req, res) => {
   if (!allow(req, res, ['POST'])) return;
+  if (!(await requireAdminOrKey(req, res))) return;
   const t0 = performance.now();
   const b = await readBody(req);
   const errors = validate(b);

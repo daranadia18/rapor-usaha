@@ -6,10 +6,11 @@ export const roleLabel = () => 'Admin';
 
 // Satu menu untuk semua; grup Admin hanya untuk admin
 function menuUntuk(user) {
-  const utama = [['/', 'Beranda', 'beranda'], ['/dashboard', 'Dashboard', 'dashboard'], ['/prediksi', 'Penilaian', 'penilaian'],
+  const utama = [['/', 'Beranda', 'beranda'], ['/dashboard', 'Dashboard', 'dashboard'],
     ['/umkm', 'UMKM', 'umkm'], ['/pemantauan', 'Pemantauan', 'pemantauan'], ['/perbandingan', 'Perbandingan', 'perbandingan'],
     ['/sus', 'Kuesioner SUS', 'sus']];
-  const admin = user ? [['/log', 'Log', 'log'], ['/sus-hasil', 'Hasil SUS', 'sus']] : [];
+  // Penilaian menulis data (survei + UMKM baru), jadi hanya untuk admin
+  const admin = user ? [['/prediksi', 'Penilaian', 'penilaian'], ['/log', 'Log', 'log'], ['/sus-hasil', 'Hasil SUS', 'sus']] : [];
   return { utama, admin };
 }
 
