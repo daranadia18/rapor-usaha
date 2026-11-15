@@ -1,7 +1,28 @@
 name: umkm
+
+# Dua cara menjalankan:
+#   1) Lengkap di Docker (Windows: klik MULAI.bat) -> COMPOSE_PROFILES=localdb,lengkap
+#      postgres + n8n-init + n8n + web, tanpa perlu Node.js di komputer.
+#   2) Pengembangan: hanya n8n (DB Neon) atau --profile localdb, web app via `npm run dev`.
+
+# Variabel bersama n8n dan n8n-init (keduanya memakai data & kunci enkripsi yang sama).
+x-n8n-env: &n8n-env
+  GENERIC_TIMEZONE: Asia/Jakarta
+  TZ: Asia/Jakarta
+  N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+  # Dipakai workflow Schedule (JS-5) untuk memanggil API web app.
+  RAPOR_BASE_URL: ${RAPOR_BASE_URL:-http://host.docker.internal:3000}
+  N8N_API_KEY: ${N8N_API_KEY:-}
+  # Notifikasi email Gmail SMTP (JS-3, JS-5 umkm-monitoring, umkm-ringkasan).
+  ALERT_EMAIL_FROM: ${ALERT_EMAIL_FROM:-}
+  ALERT_EMAIL_TO: ${ALERT_EMAIL_TO:-}
+  # Workflow Schedule memakai $env.RAPOR_BASE_URL; akses env harus diizinkan.
+  N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
+  # Jangan pakai cookie Secure saat diakses http://localhost:5678.
+  N8N_SECURE_COOKIE: "false"
+
 services:
-  # Opsional (dev offline): docker compose --profile localdb up -d
-  # Default proyek memakai Neon (DATABASE_URL), jadi hanya n8n yang dijalankan.
+  # Database lokal. Skrip sql/init/01..04 dijalankan otomatis saat volume masih kosong.
   postgres:
     image: postgres:16
     profiles: ["localdb"]
@@ -12,38 +33,74 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     # Port dibuka agar web app lokal (npm run dev) bisa terhubung ke database.
     ports:
-      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-5432}:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
-      # Skrip 01/02/03 dijalankan otomatis saat volume masih kosong
       - ./sql/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 10
-  n8n:
-    image: docker.n8n.io/n8nio/n8n
-    restart: unless-stopped
-    ports:
-      - "5678:5678"
+
+  # Sekali jalan sebelum n8n: impor kredensial + workflow (lihat scripts/n8n-init.mjs).
+  n8n-init:
+    image: docker.n8n.io/n8nio/n8n:2.46.7
+    profiles: ["lengkap"]
+    entrypoint: ["node", "/rapor/n8n-init.mjs"]
+    restart: "no"
     environment:
-      GENERIC_TIMEZONE: Asia/Jakarta
-      TZ: Asia/Jakarta
-      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
-      # Dipakai workflow Schedule (JS-5) untuk memanggil API web app.
-      RAPOR_BASE_URL: ${RAPOR_BASE_URL:-http://host.docker.internal:3000}
-      N8N_API_KEY: ${N8N_API_KEY:-}
-      # Notifikasi email Gmail SMTP (JS-3, JS-5 umkm-monitoring, umkm-ringkasan).
-      # Kredensial SMTP-nya disimpan di n8n (npm run n8n:smtp), bukan di sini.
-      ALERT_EMAIL_FROM: ${ALERT_EMAIL_FROM:-}
-      ALERT_EMAIL_TO: ${ALERT_EMAIL_TO:-}
-      # Workflow Schedule memakai $env.RAPOR_BASE_URL; akses env harus diizinkan.
-      N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
-      # Jangan pakai cookie Secure saat diakses http://localhost:5678.
-      N8N_SECURE_COOKIE: "false"
+      <<: *n8n-env
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      N8N_WEBHOOK_SECRET: ${N8N_WEBHOOK_SECRET}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
     volumes:
       - n8n_data:/home/node/.n8n
+      - ./workflows:/rapor/workflows:ro
+      - ./scripts/n8n-init.mjs:/rapor/n8n-init.mjs:ro
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:2.46.7
+    restart: unless-stopped
+    depends_on:
+      # Hanya berlaku di profile "lengkap"; di mode pengembangan n8n-init tidak ada.
+      n8n-init:
+        condition: service_completed_successfully
+        required: false
+    ports:
+      - "${N8N_PORT:-5678}:5678"
+    environment: *n8n-env
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+  # Web app (statis + API) dalam container; meniru Vercel lewat scripts/dev-server.js.
+  web:
+    build: .
+    profiles: ["lengkap"]
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      STAF_INVITE_CODE: ${STAF_INVITE_CODE:-}
+      # Penilaian lewat webhook n8n JS-4 (alamat antar-container).
+      N8N_WEBHOOK_URL: http://n8n:5678/webhook/predict
+      N8N_WEBHOOK_SECRET: ${N8N_WEBHOOK_SECRET:-}
+      N8N_API_KEY: ${N8N_API_KEY:-}
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
 volumes:
   pg_data:
   n8n_data:

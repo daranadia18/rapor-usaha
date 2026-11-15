@@ -1,0 +1,7 @@
+# Normalisasi akhir baris agar aman di-clone di Windows maupun Linux.
+* text=auto
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+*.sh  text eol=lf
+*.sql text eol=lf
+Dockerfile text eol=lf
