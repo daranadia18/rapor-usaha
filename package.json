@@ -13,7 +13,8 @@
     "db:import": "node scripts/import-data.js",
     "workflows:build": "node scripts/build-workflows.js",
     "n8n:setup": "node scripts/setup-n8n.mjs",
-    "n8n:test": "node scripts/n8n-webhook-check.mjs"
+    "n8n:test": "node scripts/n8n-webhook-check.mjs",
+    "n8n:smtp": "node scripts/n8n-smtp.mjs"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

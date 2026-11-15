@@ -34,6 +34,10 @@ services:
       # Dipakai workflow Schedule (JS-5) untuk memanggil API web app.
       RAPOR_BASE_URL: ${RAPOR_BASE_URL:-http://host.docker.internal:3000}
       N8N_API_KEY: ${N8N_API_KEY:-}
+      # Notifikasi email Gmail SMTP (JS-3, JS-5 umkm-monitoring, umkm-ringkasan).
+      # Kredensial SMTP-nya disimpan di n8n (npm run n8n:smtp), bukan di sini.
+      ALERT_EMAIL_FROM: ${ALERT_EMAIL_FROM:-}
+      ALERT_EMAIL_TO: ${ALERT_EMAIL_TO:-}
       # Workflow Schedule memakai $env.RAPOR_BASE_URL; akses env harus diizinkan.
       N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
       # Jangan pakai cookie Secure saat diakses http://localhost:5678.

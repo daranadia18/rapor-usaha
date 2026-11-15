@@ -80,6 +80,16 @@ creds[0].data = {
   ssl: db.searchParams.get('sslmode') === 'disable' ? 'disable' : 'require',
 };
 creds[1].data.value = process.env.N8N_WEBHOOK_SECRET;
+// Gmail SMTP (notifikasi email). Dilewati bila belum diisi; bisa menyusul dengan `npm run n8n:smtp`.
+const smtp = creds.find((c) => c.type === 'smtp');
+const smtpUser = (process.env.SMTP_USER || '').trim();
+const smtpPass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
+if (smtpUser && smtpPass && !smtpUser.includes('akun.pengirim')) {
+  smtp.data = { ...smtp.data, user: smtpUser, password: smtpPass };
+} else {
+  creds.splice(creds.indexOf(smtp), 1);
+  console.log('SMTP_USER/SMTP_PASS kosong: kredensial email dilewati (isi .env lalu `npm run n8n:smtp`).');
+}
 const tmp = path.join(os.tmpdir(), `rapor-creds-${process.pid}.json`);
 fs.writeFileSync(tmp, JSON.stringify(creds));
 try {

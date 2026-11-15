@@ -156,20 +156,45 @@
     },
     {
       "parameters": {
-        "chatId": "GANTI_CHAT_ID",
-        "text": "=⚠️ *{{ $json.status_message }}*\\nTotal skor: {{ $json.total_skor }} (prioritas intervensi)\\nWaktu: {{ $json.waktu_format }}",
-        "additionalFields": {}
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Susun email untuk satu UMKM dengan skor kritis (<13).\nconst u = $json;\nconst waktu = u.waktu_format\n  || $now.setZone('Asia/Jakarta').setLocale('id').toFormat('dd MMMM yyyy HH:mm');\nconst tren = u.perubahan == null\n  ? 'belum ada survei sebelumnya'\n  : (u.perubahan > 0 ? 'naik ' : u.perubahan < 0 ? 'turun ' : 'tetap ')\n    + Math.abs(u.perubahan) + ' poin dari ' + u.skor_sebelumnya;\nconst subject = '[Rapor Usaha] Prioritas Intervensi: ' + u.nama_umkm + ' (' + u.id_umkm + ')';\nconst text = [\n  'Halo Pendamping UMKM,',\n  '',\n  'Pemantauan terjadwal menemukan UMKM dengan skor kritis:',\n  '',\n  '  UMKM        : ' + u.nama_umkm + ' (' + u.id_umkm + ')',\n  '  Sektor/Kota : ' + (u.nama_sektor ?? '-') + ' / ' + (u.kota ?? '-'),\n  '  Survei      : ' + (u.tanggal ?? '-'),\n  '  Total skor  : ' + u.total_skor + ' dari 30 (' + tren + ')',\n  '  Status      : ' + u.status + ' - ' + (u.label ?? 'Prioritas Intervensi'),\n  '',\n  'Segera jadwalkan konsultasi dengan pemilik UMKM.',\n  '',\n  'Waktu pengecekan: ' + waktu + ' WIB',\n  '-- Dikirim otomatis oleh workflow n8n umkm-monitoring',\n].join('\\n');\nreturn { json: { ...u, to: $env.ALERT_EMAIL_TO, subject, text } };"
       },
-      "id": "b2000000-0000-4000-8000-000000000007",
-      "name": "Telegram (isi token & chat id)",
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
+      "id": "b2000000-0000-4000-8000-000000000009",
+      "name": "Susun Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         840,
         60
       ],
-      "disabled": true,
-      "notes": "Nonaktif secara bawaan: isi kredensial bot Telegram dan chatId, lalu aktifkan."
+      "notes": "Satu item = satu email (subjek + isi teks) per UMKM kritis."
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.ALERT_EMAIL_FROM }}",
+        "toEmail": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "emailFormat": "text",
+        "text": "={{ $json.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "b2000000-0000-4000-8000-000000000007",
+      "name": "Kirim Email",
+      "type": "n8n-nodes-base.sendEmail",
+      "typeVersion": 2.1,
+      "position": [
+        1060,
+        60
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "rapor-smtp-01",
+          "name": "Rapor Usaha SMTP"
+        }
+      },
+      "notes": "Gmail SMTP (smtp.gmail.com:465, App Password). Pengirim/penerima dari env ALERT_EMAIL_FROM/ALERT_EMAIL_TO."
     },
     {
       "parameters": {},
@@ -237,7 +262,7 @@
             "index": 0
           },
           {
-            "node": "Telegram (isi token & chat id)",
+            "node": "Susun Email",
             "type": "main",
             "index": 0
           }
@@ -245,6 +270,17 @@
         [
           {
             "node": "Tidak ada skor kritis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Susun Email": {
+      "main": [
+        [
+          {
+            "node": "Kirim Email",
             "type": "main",
             "index": 0
           }

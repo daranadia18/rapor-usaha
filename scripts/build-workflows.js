@@ -14,6 +14,7 @@ const OUT = path.join(ROOT, 'workflows');
 const CRED = {
   postgres: { id: 'rapor-postgres-01', name: 'Postgres Rapor Usaha' },
   webhook: { id: 'rapor-webhook-01', name: 'Rapor Usaha Webhook Secret' },
+  smtp: { id: 'rapor-smtp-01', name: 'Rapor Usaha SMTP' },
 };
 
 const TIMEZONE = 'Asia/Jakarta';
@@ -109,6 +110,35 @@ const CODE_PECAH = `// HTTP Request mengembalikan satu item berisi { success, da
 const res = $input.first().json;
 const rows = Array.isArray(res.data) ? res.data : (Array.isArray(res) ? res : []);
 return rows.map((row) => ({ json: row }));`;
+
+// Mode "Run Once for Each Item": satu email per UMKM kritis (<13).
+// Field asli tetap dibawa (...$json) agar terlihat di panel output.
+const CODE_EMAIL = `// Susun email untuk satu UMKM dengan skor kritis (<13).
+const u = $json;
+const waktu = u.waktu_format
+  || $now.setZone('Asia/Jakarta').setLocale('id').toFormat('dd MMMM yyyy HH:mm');
+const tren = u.perubahan == null
+  ? 'belum ada survei sebelumnya'
+  : (u.perubahan > 0 ? 'naik ' : u.perubahan < 0 ? 'turun ' : 'tetap ')
+    + Math.abs(u.perubahan) + ' poin dari ' + u.skor_sebelumnya;
+const subject = '[Rapor Usaha] Prioritas Intervensi: ' + u.nama_umkm + ' (' + u.id_umkm + ')';
+const text = [
+  'Halo Pendamping UMKM,',
+  '',
+  'Pemantauan terjadwal menemukan UMKM dengan skor kritis:',
+  '',
+  '  UMKM        : ' + u.nama_umkm + ' (' + u.id_umkm + ')',
+  '  Sektor/Kota : ' + (u.nama_sektor ?? '-') + ' / ' + (u.kota ?? '-'),
+  '  Survei      : ' + (u.tanggal ?? '-'),
+  '  Total skor  : ' + u.total_skor + ' dari 30 (' + tren + ')',
+  '  Status      : ' + u.status + ' - ' + (u.label ?? 'Prioritas Intervensi'),
+  '',
+  'Segera jadwalkan konsultasi dengan pemilik UMKM.',
+  '',
+  'Waktu pengecekan: ' + waktu + ' WIB',
+  '-- Dikirim otomatis oleh workflow n8n umkm-monitoring',
+].join('\\n');
+return { json: { ...u, to: $env.ALERT_EMAIL_TO, subject, text } };`;
 
 const workflowPredict = {
   id: 'js4umkmPredict0001',
@@ -366,18 +396,30 @@ const workflowMonitoring = {
       notes: 'sumber = schedule (JS-7).',
     },
     {
+      parameters: { mode: 'runOnceForEachItem', jsCode: CODE_EMAIL },
+      id: 'b2000000-0000-4000-8000-000000000009',
+      name: 'Susun Email',
+      type: 'n8n-nodes-base.code',
+      typeVersion: 2,
+      position: [840, 60],
+      notes: 'Satu item = satu email (subjek + isi teks) per UMKM kritis.',
+    },
+    {
       parameters: {
-        chatId: 'GANTI_CHAT_ID',
-        text: "=⚠️ *{{ $json.status_message }}*\\nTotal skor: {{ $json.total_skor }} (prioritas intervensi)\\nWaktu: {{ $json.waktu_format }}",
-        additionalFields: {},
+        fromEmail: '={{ $env.ALERT_EMAIL_FROM }}',
+        toEmail: '={{ $json.to }}',
+        subject: '={{ $json.subject }}',
+        emailFormat: 'text',
+        text: '={{ $json.text }}',
+        options: { appendAttribution: false },
       },
       id: 'b2000000-0000-4000-8000-000000000007',
-      name: 'Telegram (isi token & chat id)',
-      type: 'n8n-nodes-base.telegram',
-      typeVersion: 1.2,
-      position: [840, 60],
-      disabled: true,
-      notes: 'Nonaktif secara bawaan: isi kredensial bot Telegram dan chatId, lalu aktifkan.',
+      name: 'Kirim Email',
+      type: 'n8n-nodes-base.sendEmail',
+      typeVersion: 2.1,
+      position: [1060, 60],
+      credentials: { smtp: CRED.smtp },
+      notes: 'Gmail SMTP (smtp.gmail.com:465, App Password). Pengirim/penerima dari env ALERT_EMAIL_FROM/ALERT_EMAIL_TO.',
     },
     {
       parameters: {},
@@ -405,10 +447,13 @@ const workflowMonitoring = {
       main: [
         [
           { node: 'Catat skor kritis', type: 'main', index: 0 },
-          { node: 'Telegram (isi token & chat id)', type: 'main', index: 0 },
+          { node: 'Susun Email', type: 'main', index: 0 },
         ],
         [{ node: 'Tidak ada skor kritis', type: 'main', index: 0 }],
       ],
+    },
+    'Susun Email': {
+      main: [[{ node: 'Kirim Email', type: 'main', index: 0 }]],
     },
   },
   settings: {

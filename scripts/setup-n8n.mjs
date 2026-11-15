@@ -59,6 +59,21 @@ const requiredCredentials = [
   },
 ];
 
+// Gmail SMTP untuk node "Kirim Email" (opsional; App Password, bukan sandi login).
+if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+  requiredCredentials.push({
+    name: 'Rapor Usaha SMTP',
+    type: 'smtp',
+    data: {
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      user: process.env.SMTP_USER.trim(),
+      password: process.env.SMTP_PASS.replace(/\s+/g, ''),
+    },
+  });
+}
+
 if (!process.env.POSTGRES_PASSWORD) {
   console.error('POSTGRES_PASSWORD belum diatur di .env');
   process.exit(1);
