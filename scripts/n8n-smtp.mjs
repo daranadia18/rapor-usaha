@@ -6,7 +6,6 @@
 //   3) uji login SMTP tanpa mengirim email (transporter.verify)
 // Nilai rahasia tidak pernah dicetak ke layar.
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -53,19 +52,12 @@ for (let i = 0; i < 45; i++) {
   await sleep(2000);
 }
 
-// 2) Impor kredensial.
-const tmp = path.join(os.tmpdir(), `rapor-smtp-${process.pid}.json`);
-fs.writeFileSync(tmp, JSON.stringify([cred]), { mode: 0o600 });
-let status;
-try {
-  status = compose(['cp', tmp, 'n8n:/tmp/smtp.json']);
-  if (status === 0) {
-    status = compose(['exec', '-T', 'n8n', 'sh', '-c',
-      'n8n import:credentials --input=/tmp/smtp.json; s=$?; rm -f /tmp/smtp.json; exit $s']);
-  }
-} finally {
-  fs.rmSync(tmp, { force: true });
-}
+// 2) Impor kredensial. JSON dialirkan lewat stdin dan ditulis oleh user n8n sendiri
+//    (umask 077), sehingga bisa dihapus lagi; `docker cp` membuat file milik root
+//    yang tidak bisa dihapus user node dan sandi tertinggal di /tmp.
+const status = compose(['exec', '-T', 'n8n', 'sh', '-c',
+  'umask 077; f=$(mktemp); cat > "$f" && n8n import:credentials --input="$f"; s=$?; rm -f "$f"; exit $s'],
+{ input: JSON.stringify([cred]), stdio: ['pipe', 'inherit', 'inherit'] });
 if (status !== 0) {
   console.error('Impor kredensial SMTP gagal.');
   process.exit(1);

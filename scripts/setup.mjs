@@ -99,10 +99,11 @@ try {
     'n8n import:credentials --input=/tmp/creds.json',
     'n8n import:workflow --separate --input=/tmp/wf',
     'n8n publish:workflow --id=js4umkmPredict0001',
-    'rm -rf /tmp/creds.json /tmp/wf',
   ].join(' && '));
 } finally {
   fs.rmSync(tmp, { force: true });
+  // File hasil `docker cp` milik root; hapus sebagai root agar sandi tidak tertinggal di container.
+  compose('exec', '-T', '-u', 'root', 'n8n', 'rm', '-rf', '/tmp/creds.json', '/tmp/wf');
 }
 
 // 5) Restart agar aktivasi workflow terbaca

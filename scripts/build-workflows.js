@@ -415,7 +415,7 @@ const workflowMonitoring = {
       },
       id: 'b2000000-0000-4000-8000-000000000007',
       name: 'Kirim Email',
-      type: 'n8n-nodes-base.sendEmail',
+      type: 'n8n-nodes-base.emailSend',
       typeVersion: 2.1,
       position: [1060, 60],
       credentials: { smtp: CRED.smtp },
