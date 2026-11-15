@@ -113,15 +113,35 @@ return rows.map((row) => ({ json: row }));`;
 
 // Mode "Run Once for Each Item": satu email per UMKM kritis (<13).
 // Field asli tetap dibawa (...$json) agar terlihat di panel output.
-const CODE_EMAIL = `// Susun email untuk satu UMKM dengan skor kritis (<13).
+// Email dikirim dua format: HTML (template berwarna, tabel inline-style agar aman di Gmail/Outlook)
+// dan teks biasa sebagai cadangan untuk aplikasi email yang tidak menampilkan HTML.
+// String.raw: kode di bawah tidak boleh memuat backtick atau tanda dolar-kurung-kurawal.
+const CODE_EMAIL = String.raw`// Susun email (HTML + teks) untuk satu UMKM dengan skor kritis (<13).
 const u = $json;
 const waktu = u.waktu_format
   || $now.setZone('Asia/Jakarta').setLocale('id').toFormat('dd MMMM yyyy HH:mm');
+const esc = (v) => String(v ?? '-').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+// Warna status sama dengan website (public/css/style.css).
+const STATUS = {
+  SANGAT_SEHAT: { nama: 'Sangat Sehat', warna: '#1f8a4c', soft: '#e2f4e9', ink: '#115c33' },
+  SEHAT: { nama: 'Sehat', warna: '#13879c', soft: '#def2f5', ink: '#0b5966' },
+  CUKUP_SEHAT: { nama: 'Cukup Sehat', warna: '#e09a12', soft: '#fdf0d5', ink: '#7d4f00' },
+  KURANG_SEHAT: { nama: 'Kurang Sehat', warna: '#d6453a', soft: '#fde6e4', ink: '#9c2a21' },
+};
+const st = STATUS[u.status] || STATUS.KURANG_SEHAT;
+const skor = Number(u.total_skor);
+const persen = Math.max(4, Math.min(100, Math.round(skor / 30 * 100)));
+
 const tren = u.perubahan == null
   ? 'belum ada survei sebelumnya'
   : (u.perubahan > 0 ? 'naik ' : u.perubahan < 0 ? 'turun ' : 'tetap ')
     + Math.abs(u.perubahan) + ' poin dari ' + u.skor_sebelumnya;
+const trenWarna = u.perubahan == null || u.perubahan === 0 ? '#556070' : (u.perubahan < 0 ? '#c23a2f' : '#15803d');
+const trenPanah = u.perubahan == null ? '' : (u.perubahan < 0 ? '&#9660; ' : u.perubahan > 0 ? '&#9650; ' : '');
+
 const subject = '[Rapor Usaha] Prioritas Intervensi: ' + u.nama_umkm + ' (' + u.id_umkm + ')';
+
 const text = [
   'Halo Pendamping UMKM,',
   '',
@@ -137,8 +157,70 @@ const text = [
   '',
   'Waktu pengecekan: ' + waktu + ' WIB',
   '-- Dikirim otomatis oleh workflow n8n umkm-monitoring',
-].join('\\n');
-return { json: { ...u, to: $env.ALERT_EMAIL_TO, subject, text } };`;
+].join('\n');
+
+const FONT = "font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;";
+const baris = (label, nilai) =>
+  '<tr><td style="' + FONT + 'padding:11px 0;border-bottom:1px solid #e3e7ee;color:#556070;font-size:14px;width:38%;vertical-align:top">' + label + '</td>'
+  + '<td style="' + FONT + 'padding:11px 0;border-bottom:1px solid #e3e7ee;color:#111827;font-size:14px;font-weight:600">' + nilai + '</td></tr>';
+
+const html = [
+  '<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">',
+  '<meta name="color-scheme" content="light"><title>' + esc(subject) + '</title></head>',
+  '<body style="margin:0;padding:0;background:#f4f6fa">',
+  '<div style="display:none;max-height:0;overflow:hidden;opacity:0">' + esc(u.nama_umkm) + ': skor ' + skor + ' dari 30, perlu pendampingan segera.</div>',
+  '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6fa"><tr><td align="center" style="padding:28px 12px">',
+  '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border:1px solid #e3e7ee;border-radius:12px;border-collapse:separate">',
+
+  // Kepala
+  '<tr><td style="' + FONT + 'background:#2453c9;border-radius:12px 12px 0 0;padding:18px 28px">',
+  '<div style="color:#ffffff;font-size:18px;font-weight:700">Rapor Usaha</div>',
+  '<div style="color:#dbe5fb;font-size:13px;margin-top:2px">Pemantauan Kesehatan UMKM</div></td></tr>',
+
+  // Judul
+  '<tr><td style="' + FONT + 'padding:28px 28px 4px">',
+  '<span style="display:inline-block;background:#fde6e4;color:#9c2a21;font-size:12px;font-weight:700;letter-spacing:.06em;padding:5px 11px;border-radius:999px">PRIORITAS INTERVENSI</span>',
+  '<h1 style="margin:14px 0 8px;font-size:22px;line-height:1.3;color:#111827">' + esc(u.nama_umkm) + ' perlu pendampingan segera</h1>',
+  '<p style="margin:0;font-size:15px;line-height:1.6;color:#374151">Halo Pendamping UMKM, pemantauan terjadwal menemukan UMKM dengan skor kesehatan <strong>kritis</strong> (di bawah 13 dari 30).</p>',
+  '</td></tr>',
+
+  // Kartu skor
+  '<tr><td style="padding:20px 28px 8px">',
+  '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:' + st.soft + ';border-radius:10px"><tr><td style="' + FONT + 'padding:18px 20px">',
+  '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>',
+  '<td style="' + FONT + 'vertical-align:bottom"><div style="font-size:13px;font-weight:600;color:' + st.ink + '">Total skor</div>',
+  '<div style="margin-top:2px"><span style="font-size:38px;font-weight:700;line-height:1;color:' + st.ink + '">' + skor + '</span>',
+  '<span style="font-size:16px;color:' + st.ink + '"> / 30</span></div></td>',
+  '<td align="right" style="' + FONT + 'vertical-align:bottom"><span style="display:inline-block;background:' + st.warna + ';color:#ffffff;font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px">' + st.nama + '</span></td>',
+  '</tr></table>',
+  '<div style="margin-top:14px;background:#ffffff;border-radius:999px;height:8px;line-height:8px;font-size:0">',
+  '<div style="width:' + persen + '%;background:' + st.warna + ';border-radius:999px;height:8px;line-height:8px;font-size:0">&nbsp;</div></div>',
+  '</td></tr></table></td></tr>',
+
+  // Rincian
+  '<tr><td style="padding:12px 28px 4px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">',
+  baris('ID UMKM', esc(u.id_umkm)),
+  baris('Sektor', esc(u.nama_sektor)),
+  baris('Kota', esc(u.kota)),
+  baris('Tanggal survei', esc(u.tanggal)),
+  baris('Keterangan', esc(u.label ?? 'Prioritas Intervensi')),
+  baris('Perubahan skor', '<span style="color:' + trenWarna + '">' + trenPanah + esc(tren) + '</span>'),
+  '</table></td></tr>',
+
+  // Langkah berikutnya
+  '<tr><td style="padding:20px 28px 28px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>',
+  '<td style="' + FONT + 'background:#eaf0fc;border-left:4px solid #2453c9;border-radius:6px;padding:14px 16px;font-size:14px;line-height:1.6;color:#1c3f99">',
+  '<strong>Langkah berikutnya</strong><br>Segera jadwalkan konsultasi dengan pemilik UMKM untuk meninjau faktor yang rendah dan menyusun rencana perbaikan.',
+  '</td></tr></table></td></tr>',
+
+  // Kaki
+  '<tr><td style="' + FONT + 'padding:16px 28px 20px;border-top:1px solid #e3e7ee;color:#6b7280;font-size:12px;line-height:1.6">',
+  'Waktu pengecekan: ' + esc(waktu) + ' WIB<br>Dikirim otomatis oleh workflow n8n <strong>umkm-monitoring</strong>. Email ini tidak perlu dibalas.',
+  '</td></tr>',
+  '</table></td></tr></table></body></html>',
+].join('');
+
+return { json: { ...u, to: $env.ALERT_EMAIL_TO, subject, text, html } };`;
 
 const workflowPredict = {
   id: 'js4umkmPredict0001',
@@ -363,7 +445,7 @@ const workflowMonitoring = {
               id: 'd2000000-0000-4000-8000-000000000004',
               leftValue: '={{ $json.total_skor }}',
               rightValue: 13,
-              operator: { type: 'number', operation: 'smaller' },
+              operator: { type: 'number', operation: 'lt' },
             },
           ],
           combinator: 'and',
@@ -402,15 +484,16 @@ const workflowMonitoring = {
       type: 'n8n-nodes-base.code',
       typeVersion: 2,
       position: [840, 60],
-      notes: 'Satu item = satu email (subjek + isi teks) per UMKM kritis.',
+      notes: 'Satu item = satu email (subjek + HTML + teks) per UMKM kritis.',
     },
     {
       parameters: {
         fromEmail: '={{ $env.ALERT_EMAIL_FROM }}',
         toEmail: '={{ $json.to }}',
         subject: '={{ $json.subject }}',
-        emailFormat: 'text',
+        emailFormat: 'both',
         text: '={{ $json.text }}',
+        html: '={{ $json.html }}',
         options: { appendAttribution: false },
       },
       id: 'b2000000-0000-4000-8000-000000000007',
